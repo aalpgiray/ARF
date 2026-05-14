@@ -1,12 +1,10 @@
 import { config } from 'dotenv';
 config({ path: '.env.local' });
 
-import { neon } from '@neondatabase/serverless';
 import { PrismaNeon } from '@prisma/adapter-neon';
 import { PrismaClient, BoatState } from '@prisma/client';
 
-const sql = neon(process.env.DATABASE_URL!);
-const adapter = new PrismaNeon(sql);
+const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
 const boats = [

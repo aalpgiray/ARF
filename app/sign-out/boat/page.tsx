@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Chrome from '@/components/Chrome';
 import Footer from '@/components/Footer';
@@ -17,7 +17,7 @@ interface BoatRecord {
 
 const CATEGORIES = ['1x', '2x', '2-', '4x', '4+', '8+'];
 
-export default function BoatPickerPage() {
+function BoatPickerPageInner() {
   const router = useRouter();
   const params = useSearchParams();
   const memberId = params.get('member_id');
@@ -177,5 +177,13 @@ export default function BoatPickerPage() {
         </Footer>
       </div>
     </>
+  );
+}
+
+export default function BoatPickerPage() {
+  return (
+    <Suspense fallback={null}>
+      <BoatPickerPageInner />
+    </Suspense>
   );
 }

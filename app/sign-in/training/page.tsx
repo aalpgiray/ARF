@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Chrome from '@/components/Chrome';
 import Footer from '@/components/Footer';
@@ -50,7 +50,7 @@ function strokesEstimate(distanceKm: number): string {
   return `≈ ${strokes.toLocaleString()}`;
 }
 
-export default function TrainingPage() {
+function TrainingPageInner() {
   const router = useRouter();
   const params = useSearchParams();
   const sessionId = params.get('session_id');
@@ -230,5 +230,13 @@ export default function TrainingPage() {
         </Footer>
       </div>
     </>
+  );
+}
+
+export default function TrainingPage() {
+  return (
+    <Suspense fallback={null}>
+      <TrainingPageInner />
+    </Suspense>
   );
 }

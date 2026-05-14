@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Chrome from '@/components/Chrome';
 import Footer from '@/components/Footer';
@@ -36,7 +36,7 @@ function durationLabel(minutes: number) {
 interface MemberInfo { displayName: string }
 interface BoatInfo { name: string; category: string; weightKg: number | null }
 
-export default function ReturnTimePage() {
+function ReturnTimePageInner() {
   const router = useRouter();
   const params = useSearchParams();
   const memberId = params.get('member_id');
@@ -151,5 +151,13 @@ export default function ReturnTimePage() {
         </Footer>
       </div>
     </>
+  );
+}
+
+export default function ReturnTimePage() {
+  return (
+    <Suspense fallback={null}>
+      <ReturnTimePageInner />
+    </Suspense>
   );
 }
