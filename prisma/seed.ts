@@ -1,52 +1,108 @@
-import { config } from 'dotenv';
-config({ path: '.env.local' });
+import fs from 'node:fs';
+import path from 'node:path';
 
 import { PrismaNeon } from '@prisma/adapter-neon';
-import { PrismaClient, BoatState } from '@prisma/client';
+import { BoatState, PrismaClient } from '@prisma/client';
+import { config } from 'dotenv';
+
+config({ path: '.env.local' });
 
 const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
-const members = [
-  { googleUserId: 'dummy-001', displayName: 'Alice Morgan',    email: 'alice.morgan@club.org',    squad: 'Senior' },
-  { googleUserId: 'dummy-002', displayName: 'Ben Hartley',     email: 'ben.hartley@club.org',     squad: 'Senior' },
-  { googleUserId: 'dummy-003', displayName: 'Clara Jensen',    email: 'clara.jensen@club.org',    squad: 'Junior' },
-  { googleUserId: 'dummy-004', displayName: 'David Okafor',    email: 'david.okafor@club.org',    squad: 'Senior' },
-  { googleUserId: 'dummy-005', displayName: 'Emma Sutton',     email: 'emma.sutton@club.org',     squad: 'Masters' },
-  { googleUserId: 'dummy-006', displayName: 'Finn Lowe',       email: 'finn.lowe@club.org',       squad: 'Junior' },
-  { googleUserId: 'dummy-007', displayName: 'Grace Patel',     email: 'grace.patel@club.org',     squad: 'Senior' },
-  { googleUserId: 'dummy-008', displayName: 'Hugo Brennan',    email: 'hugo.brennan@club.org',    squad: 'Masters' },
-  { googleUserId: 'dummy-009', displayName: 'Isla McKenzie',   email: 'isla.mckenzie@club.org',   squad: 'Senior' },
-  { googleUserId: 'dummy-010', displayName: 'Jack Rowe',       email: 'jack.rowe@club.org',       squad: 'Junior' },
-  { googleUserId: 'dummy-011', displayName: 'Kate Drummond',   email: 'kate.drummond@club.org',   squad: 'Senior' },
-  { googleUserId: 'dummy-012', displayName: 'Leo Vasquez',     email: 'leo.vasquez@club.org',     squad: 'Senior' },
-  { googleUserId: 'dummy-013', displayName: 'Maya Thornton',   email: 'maya.thornton@club.org',   squad: 'Masters' },
-  { googleUserId: 'dummy-014', displayName: 'Noah Fitzgerald', email: 'noah.fitzgerald@club.org', squad: 'Junior' },
-  { googleUserId: 'dummy-015', displayName: 'Olivia Chan',     email: 'olivia.chan@club.org',     squad: 'Senior' },
-  { googleUserId: 'dummy-016', displayName: 'Pete Samuels',    email: 'pete.samuels@club.org',    squad: 'Masters' },
-  { googleUserId: 'dummy-017', displayName: 'Quinn Adler',     email: 'quinn.adler@club.org',     squad: 'Senior' },
-  { googleUserId: 'dummy-018', displayName: 'Rosa Billings',   email: 'rosa.billings@club.org',   squad: 'Junior' },
-  { googleUserId: 'dummy-019', displayName: 'Sam Whitfield',   email: 'sam.whitfield@club.org',   squad: 'Senior' },
-  { googleUserId: 'dummy-020', displayName: 'Tara Nguyen',     email: 'tara.nguyen@club.org',     squad: 'Masters' },
-];
+const SKIP_DISPLAY_NAMES = new Set([
+  'Calendar Website',
+  'Doodle Bot',
+  'Forms Forms',
+  'Google Drive',
+  'Hamell Hamell',
+  'Natalia Natalia',
+  'Notion Notifications',
+  'Polly Polly',
+  'rentout archive',
+  'Simple Poll',
+  'Steffi Steffi',
+  'Zoom Zoom',
+]);
 
-const boats = [
-  { name: 'Heron',      category: '1x', yearBuilt: 2021, weightKg: 14, state: BoatState.AVAILABLE },
-  { name: 'Kingfisher', category: '2x', yearBuilt: 2019, weightKg: 27, state: BoatState.AVAILABLE },
-  { name: 'Stormcock',  category: '4x', yearBuilt: 2017, weightKg: 52, state: BoatState.AVAILABLE },
-  { name: 'Otter',      category: '1x', yearBuilt: 2022, weightKg: 14, state: BoatState.AVAILABLE },
-  { name: 'Mallard',    category: '2-', yearBuilt: 2018, weightKg: 26, state: BoatState.AVAILABLE },
-  { name: 'Curlew',     category: '4+', yearBuilt: 2020, weightKg: 52, state: BoatState.AVAILABLE },
-  { name: 'Bittern',    category: '2x', yearBuilt: 2023, weightKg: 27, state: BoatState.AVAILABLE },
-  { name: 'Pintail',    category: '8+', yearBuilt: 2015, weightKg: 96, state: BoatState.MAINTENANCE },
-  { name: 'Lapwing',    category: '4x', yearBuilt: 2019, weightKg: 52, state: BoatState.AVAILABLE },
-  { name: 'Tern',       category: '1x', yearBuilt: 2020, weightKg: 14, state: BoatState.AVAILABLE },
-  { name: 'Razorbill',  category: '2x', yearBuilt: 2018, weightKg: 27, state: BoatState.AVAILABLE },
-  { name: 'Shearwater', category: '4+', yearBuilt: 2022, weightKg: 54, state: BoatState.AVAILABLE },
-];
+function loadMembersFromCsv() {
+  const csvPath = path.join(__dirname, 'seed-data', 'User_Download_14052026_210824.csv');
+  const lines = fs.readFileSync(csvPath, 'utf-8').split('\n').slice(1); // skip header
+  const members = [];
+  for (const line of lines) {
+    const cols = line.split(',');
+    if (cols.length < 3) continue;
+    const firstName = cols[0].trim();
+    const lastName = cols[1].trim();
+    const email = cols[2].trim().toLowerCase();
+    if (!email || !firstName) continue;
+    const displayName = `${firstName} ${lastName}`.trim();
+    if (SKIP_DISPLAY_NAMES.has(displayName)) continue;
+    members.push({
+      googleUserId: `csv-${email}`,
+      displayName,
+      email,
+      squad: null,
+    });
+  }
+  return members;
+}
+
+const members = loadMembersFromCsv();
+
+const NON_BOAT_PATTERN = /^(Erg|Bike)\s/i;
+
+function categoryFromRow(description: string, capacity: number, isSweep: boolean): string {
+  const desc = description.trim().toUpperCase();
+  if (desc === 'SINGLE') return '1x';
+  if (desc === '2X') return '2x';
+  if (desc === '4X') return '4x';
+  if (isSweep && capacity >= 8) return '8+';
+  if (isSweep && capacity >= 4) return '4+';
+  if (isSweep && capacity >= 2) return '2-';
+  if (capacity >= 8) return '8x';
+  if (capacity >= 4) return '4x';
+  if (capacity >= 2) return '2x';
+  return '1x';
+}
+
+function loadBoatsFromCsv() {
+  const csvPath = path.join(__dirname, 'seed-data', 'Resources.csv');
+  const lines = fs.readFileSync(csvPath, 'utf-8').split('\n').slice(1);
+  const boats = [];
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    // columns: Resource Id, Resource Name, Building Id, Resource Category, Resource Type, Floor Name, Capacity, Floor Section, User Visible Description, Description, #Scull, #Sweep
+    const cols = line.split(',');
+    if (cols.length < 12) continue;
+    const name = cols[1].trim();
+    const resourceType = cols[4].trim();
+    const capacity = parseInt(cols[6].trim(), 10) || 0;
+    const description = cols[8].trim();
+    const isSweep = cols[11].trim().toUpperCase() === 'TRUE';
+    if (!name) continue;
+    if (resourceType === 'Trailer') continue;
+    if (NON_BOAT_PATTERN.test(name)) continue;
+    if (capacity === 0) continue;
+    boats.push({
+      name,
+      category: categoryFromRow(description, capacity, isSweep),
+      state: BoatState.AVAILABLE,
+    });
+  }
+  return boats;
+}
+
+const boats = loadBoatsFromCsv();
 
 async function main() {
   console.log('Seeding members...');
+  const memberEmails = members.map((m) => m.email);
+  const staleMembers = await prisma.member.findMany({ where: { email: { notIn: memberEmails } }, select: { id: true } });
+  if (staleMembers.length) {
+    await prisma.member.deleteMany({ where: { id: { in: staleMembers.map((m) => m.id) } } });
+    console.log(`Deleted ${staleMembers.length} stale members.`);
+  }
   for (const member of members) {
     await prisma.member.upsert({
       where: { googleUserId: member.googleUserId },
@@ -57,10 +113,17 @@ async function main() {
   console.log(`Seeded ${members.length} members.`);
 
   console.log('Seeding boats...');
+  const boatNames = boats.map((b) => b.name);
+  const stale = await prisma.boat.findMany({ where: { name: { notIn: boatNames } }, select: { id: true } });
+  if (stale.length) {
+    await prisma.session.deleteMany({ where: { boatId: { in: stale.map((b) => b.id) } } });
+    await prisma.boat.deleteMany({ where: { id: { in: stale.map((b) => b.id) } } });
+    console.log(`Deleted ${stale.length} stale boats.`);
+  }
   for (const boat of boats) {
     await prisma.boat.upsert({
       where: { name: boat.name },
-      update: {},
+      update: { category: boat.category },
       create: boat,
     });
   }
