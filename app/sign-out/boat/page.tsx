@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Chrome from '@/components/Chrome';
 import Footer from '@/components/Footer';
+import PageContent from '@/components/PageContent';
 import StepIndicator from '@/components/StepIndicator';
 
 interface BoatRecord {
@@ -86,71 +87,77 @@ function BoatPickerPageInner() {
           </div>
         </div>
 
-        {loading ? (
-          <div style={{ padding: '40px 32px', color: 'var(--ink-mute)' }}>Loading boats…</div>
-        ) : layout === 'grid' ? (
-          <div className="boat-grid">
-            {filtered.map((b) => {
-              const unavailable = b.effectiveState !== 'available';
-              return (
-                <div
-                  key={b.id}
-                  className={[
-                    'boat-card',
-                    selectedId === b.id ? 'selected' : '',
-                    unavailable ? 'unavailable' : '',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')}
-                  onClick={() => !unavailable && setSelectedId(b.id)}
-                >
-                  {b.effectiveState === 'out' && <span className="pill out">Out</span>}
-                  {b.effectiveState === 'maintenance' && <span className="pill out">Maint.</span>}
-                  {selectedId === b.id && <span className="pill">Selected</span>}
-                  <div className="cat">{b.category} · scull</div>
-                  <div className="nm">{b.name}</div>
-                  <div className="meta">
-                    {b.yearBuilt && <span><b>{b.yearBuilt}</b> built</span>}
-                    {b.weightKg && <span><b>{b.weightKg}kg</b></span>}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="boat-list">
-            {filtered.map((b) => {
-              const unavailable = b.effectiveState !== 'available';
-              return (
-                <div
-                  key={b.id}
-                  className={['boat-row', selectedId === b.id ? 'selected' : ''].filter(Boolean).join(' ')}
-                  onClick={() => !unavailable && setSelectedId(b.id)}
-                  style={{ cursor: unavailable ? 'not-allowed' : 'pointer', opacity: unavailable ? 0.45 : 1 }}
-                >
-                  <div>
+        <PageContent>
+          {loading ? (
+            <div style={{ padding: '40px 32px', color: 'var(--ink-mute)' }}>Loading boats…</div>
+          ) : layout === 'grid' ? (
+            <div className="boat-grid">
+              {filtered.map((b) => {
+                const unavailable = b.effectiveState !== 'available';
+                return (
+                  <button
+                    type="button"
+                    key={b.id}
+                    className={[
+                      'boat-card',
+                      selectedId === b.id ? 'selected' : '',
+                      unavailable ? 'unavailable' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                    disabled={unavailable}
+                    onClick={() => setSelectedId(b.id)}
+                  >
+                    {b.effectiveState === 'out' && <span className="pill out">Out</span>}
+                    {b.effectiveState === 'maintenance' && <span className="pill out">Maint.</span>}
+                    {selectedId === b.id && <span className="pill">Selected</span>}
+                    <div className="cat">{b.category} · scull</div>
                     <div className="nm">{b.name}</div>
-                    <div className="cat" style={{ marginTop: 4 }}>{b.category}</div>
-                  </div>
-                  {b.yearBuilt && <div className="cat">Built {b.yearBuilt}</div>}
-                  {b.weightKg && <div className="cat">Hull {b.weightKg}kg</div>}
-                  <div className="cat">
-                    {b.effectiveState === 'available' ? 'On rack' : b.effectiveState === 'out' ? 'On water' : 'Workshop'}
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    {selectedId === b.id ? (
-                      <span className="chip brass">Selected</span>
-                    ) : b.effectiveState !== 'available' ? (
-                      <span className="chip clay">Unavailable</span>
-                    ) : (
-                      <span className="chip ok">Available</span>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+                    <div className="meta">
+                      {b.yearBuilt && <span><b>{b.yearBuilt}</b> built</span>}
+                      {b.weightKg && <span><b>{b.weightKg}kg</b></span>}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="boat-list">
+              {filtered.map((b) => {
+                const unavailable = b.effectiveState !== 'available';
+                return (
+                  <button
+                    type="button"
+                    key={b.id}
+                    className={['boat-row', selectedId === b.id ? 'selected' : ''].filter(Boolean).join(' ')}
+                    disabled={unavailable}
+                    onClick={() => setSelectedId(b.id)}
+                    style={{ opacity: unavailable ? 0.45 : 1 }}
+                  >
+                    <div>
+                      <div className="nm">{b.name}</div>
+                      <div className="cat" style={{ marginTop: 4 }}>{b.category}</div>
+                    </div>
+                    {b.yearBuilt && <div className="cat">Built {b.yearBuilt}</div>}
+                    {b.weightKg && <div className="cat">Hull {b.weightKg}kg</div>}
+                    <div className="cat">
+                      {b.effectiveState === 'available' ? 'On rack' : b.effectiveState === 'out' ? 'On water' : 'Workshop'}
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      {selectedId === b.id ? (
+                        <span className="chip brass">Selected</span>
+                      ) : b.effectiveState !== 'available' ? (
+                        <span className="chip clay">Unavailable</span>
+                      ) : (
+                        <span className="chip ok">Available</span>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </PageContent>
 
         <Footer>
           <button className="btn btn-ghost btn-lg" onClick={() => router.push('/sign-out')}>

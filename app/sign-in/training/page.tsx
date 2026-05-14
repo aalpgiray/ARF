@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Chrome from '@/components/Chrome';
 import Footer from '@/components/Footer';
+import PageContent from '@/components/PageContent';
 
 const DISTANCE_PRESETS = [4, 6, 8, 10, 12];
 const SESSION_TYPES = ['STEADY', 'UT2', 'UT1', 'AT', 'INTERVALS', 'RACE', 'OUTING'] as const;
@@ -116,110 +117,116 @@ function TrainingPageInner() {
           <span className="chip">Optional</span>
         </div>
 
-        <div className="training">
-          <div className="panel">
-            <div>
-              <div className="lbl">Distance</div>
-              <div className="field">
-                <div className="v">
-                  {distanceKm !== null ? (
-                    <>{distanceKm}<small>km</small></>
-                  ) : (
-                    <span style={{ color: 'var(--ink-mute)', fontSize: 28 }}>—</span>
-                  )}
+        <PageContent>
+          <div className="training">
+            <div className="panel">
+              <div>
+                <div className="lbl">Distance</div>
+                <div className="field">
+                  <div className="v">
+                    {distanceKm !== null ? (
+                      <>{distanceKm}<small>km</small></>
+                    ) : (
+                      <span style={{ color: 'var(--ink-mute)', fontSize: 28 }}>—</span>
+                    )}
+                  </div>
+                </div>
+                <div className="duration-chips" style={{ marginTop: 8 }}>
+                  {DISTANCE_PRESETS.map((d) => (
+                    <button
+                      type="button"
+                      key={d}
+                      className={distanceKm === d && !showCustom ? 'on' : ''}
+                      onClick={() => { setDistanceKm(d); setShowCustom(false); }}
+                    >
+                      {d} km
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    className={showCustom ? 'on' : ''}
+                    onClick={() => setShowCustom(true)}
+                  >
+                    Custom
+                  </button>
+                </div>
+                {showCustom && (
+                  <div style={{ display: 'flex', gap: 8, marginTop: 8, alignItems: 'center' }}>
+                    <input
+                      type="number"
+                      min="0.1"
+                      step="0.1"
+                      placeholder="km"
+                      value={customDistanceInput}
+                      onChange={(e) => setCustomDistanceInput(e.target.value)}
+                      style={{ width: 80, padding: '6px 10px', borderRadius: 'var(--rad-sm)', border: '1px solid var(--ink-3)', fontFamily: 'var(--mono)', fontSize: 14 }}
+                    />
+                    <button type="button" className="btn btn-primary" onClick={handleCustomDistance}>Set</button>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <div className="lbl">Session type</div>
+                <div className="seg" style={{ marginTop: 8, flexWrap: 'wrap' }}>
+                  {SESSION_TYPES.map((t) => (
+                    <button
+                      type="button"
+                      key={t}
+                      className={sessionType === t ? 'on' : ''}
+                      onClick={() => setSessionType(sessionType === t ? null : t)}
+                    >
+                      {SESSION_TYPE_LABELS[t]}
+                    </button>
+                  ))}
                 </div>
               </div>
-              <div className="duration-chips" style={{ marginTop: 8 }}>
-                {DISTANCE_PRESETS.map((d) => (
-                  <button
-                    key={d}
-                    className={distanceKm === d && !showCustom ? 'on' : ''}
-                    onClick={() => { setDistanceKm(d); setShowCustom(false); }}
-                  >
-                    {d} km
-                  </button>
-                ))}
-                <button
-                  className={showCustom ? 'on' : ''}
-                  onClick={() => setShowCustom(true)}
-                >
-                  Custom
-                </button>
+
+              <div>
+                <div className="lbl">Notes</div>
+                <textarea
+                  placeholder="Conditions, observations, boat issues…"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                />
               </div>
-              {showCustom && (
-                <div style={{ display: 'flex', gap: 8, marginTop: 8, alignItems: 'center' }}>
-                  <input
-                    type="number"
-                    min="0.1"
-                    step="0.1"
-                    placeholder="km"
-                    value={customDistanceInput}
-                    onChange={(e) => setCustomDistanceInput(e.target.value)}
-                    style={{ width: 80, padding: '6px 10px', borderRadius: 'var(--rad-sm)', border: '1px solid var(--ink-3)', fontFamily: 'var(--mono)', fontSize: 14 }}
-                  />
-                  <button className="btn btn-primary" onClick={handleCustomDistance}>Set</button>
+            </div>
+
+            <div className="summary">
+              <div className="lbl">Today's row</div>
+              <div className="row">
+                <span>Duration</span>
+                <span className="v">{durationLabel(durationMinutes)}</span>
+              </div>
+              <div className="row">
+                <span>Distance</span>
+                <span className="v">{distanceKm !== null ? `${distanceKm} km` : '—'}</span>
+              </div>
+              <div className="row">
+                <span>Avg pace</span>
+                <span className="v">{paceLabel(distanceKm ?? 0, durationMinutes)}</span>
+              </div>
+              <div className="row">
+                <span>Strokes</span>
+                <span className="v">{strokesEstimate(distanceKm ?? 0)}</span>
+              </div>
+              {session && (
+                <div style={{ marginTop: 'auto', fontSize: 13, color: 'rgba(242,237,227,0.7)', lineHeight: 1.5 }}>
+                  Logged under <b style={{ color: 'var(--sand)' }}>{session.boat.category}</b>.
                 </div>
               )}
             </div>
-
-            <div>
-              <div className="lbl">Session type</div>
-              <div className="seg" style={{ marginTop: 8, flexWrap: 'wrap' }}>
-                {SESSION_TYPES.map((t) => (
-                  <button
-                    key={t}
-                    className={sessionType === t ? 'on' : ''}
-                    onClick={() => setSessionType(sessionType === t ? null : t)}
-                  >
-                    {SESSION_TYPE_LABELS[t]}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <div className="lbl">Notes</div>
-              <textarea
-                placeholder="Conditions, observations, boat issues…"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-              />
-            </div>
           </div>
-
-          <div className="summary">
-            <div className="lbl">Today's row</div>
-            <div className="row">
-              <span>Duration</span>
-              <span className="v">{durationLabel(durationMinutes)}</span>
-            </div>
-            <div className="row">
-              <span>Distance</span>
-              <span className="v">{distanceKm !== null ? `${distanceKm} km` : '—'}</span>
-            </div>
-            <div className="row">
-              <span>Avg pace</span>
-              <span className="v">{paceLabel(distanceKm ?? 0, durationMinutes)}</span>
-            </div>
-            <div className="row">
-              <span>Strokes</span>
-              <span className="v">{strokesEstimate(distanceKm ?? 0)}</span>
-            </div>
-            {session && (
-              <div style={{ marginTop: 'auto', fontSize: 13, color: 'rgba(242,237,227,0.7)', lineHeight: 1.5 }}>
-                Logged under <b style={{ color: 'var(--sand)' }}>{session.boat.category}</b>.
-              </div>
-            )}
-          </div>
-        </div>
+        </PageContent>
 
         <Footer>
-          <button className="btn btn-text" onClick={() => router.push('/')}>
+          <button type="button" className="btn btn-text" onClick={() => router.push('/')}>
             Skip — just sign me in
           </button>
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 14, alignItems: 'center' }}>
             <span style={{ color: 'var(--ink-mute)', fontSize: 14 }}>Saves to your training log</span>
             <button
+              type="button"
               className="btn btn-primary btn-lg"
               disabled={saving}
               onClick={handleSave}

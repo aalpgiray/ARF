@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Chrome from '@/components/Chrome';
 import Footer from '@/components/Footer';
+import PageContent from '@/components/PageContent';
 
 function pad(n: number) { return String(n).padStart(2, '0'); }
 function initials(name: string) {
@@ -68,71 +69,74 @@ export default function SignInPage() {
           )}
         </div>
 
-        {loading && (
-          <div className="empty">
-            <p>Loading…</p>
-          </div>
-        )}
+        <PageContent>
+          {loading && (
+            <div className="empty">
+              <p>Loading…</p>
+            </div>
+          )}
 
-        {!loading && sessions.length === 0 && (
-          <div className="empty">
-            <p>No active sessions — everyone is ashore.</p>
-          </div>
-        )}
+          {!loading && sessions.length === 0 && (
+            <div className="empty">
+              <p>No active sessions — everyone is ashore.</p>
+            </div>
+          )}
 
-        {!loading && sessions.length > 0 && (
-          <div className="signin-grid">
-            {sessions.map((s, i) => (
-              <div key={s.id} className={`signin-row${i === 0 ? ' featured' : ''}`}>
-                <div className="who">
-                  <div className="av">{initials(s.who)}</div>
-                  <div>
-                    <div className="nm">{s.who}</div>
-                    <div className="sub">
-                      Signed out {s.outTime} · {elapsedLabel(s.elapsedMinutes)} ago
+          {!loading && sessions.length > 0 && (
+            <div className="signin-grid">
+              {sessions.map((s, i) => (
+                <div key={s.id} className={`signin-row${i === 0 ? ' featured' : ''}`}>
+                  <div className="who">
+                    <div className="av">{initials(s.who)}</div>
+                    <div>
+                      <div className="nm">{s.who}</div>
+                      <div className="sub">
+                        Signed out {s.outTime} · {elapsedLabel(s.elapsedMinutes)} ago
+                      </div>
                     </div>
                   </div>
+                  <div>
+                    <div className="boat">{s.boatName}</div>
+                    <div className="meta">{s.category}</div>
+                  </div>
+                  <div className="tcol">
+                    {s.expectedReturn}
+                    <span className="meta">Expected</span>
+                  </div>
+                  <div
+                    className="tcol"
+                    style={{
+                      color: s.overdue
+                        ? 'var(--clay)'
+                        : i === 0
+                        ? 'rgba(242,237,227,0.85)'
+                        : 'var(--ink-2)',
+                    }}
+                  >
+                    {s.overdue ? `+${s.overdueMinutes}m` : 'On time'}
+                    <span className="meta">vs plan</span>
+                  </div>
+                  <button
+                    type="button"
+                    className={`btn ${i === 0 ? 'btn-ghost' : 'btn-primary'}`}
+                    style={
+                      i === 0
+                        ? { borderColor: 'rgba(242,237,227,0.4)', color: 'var(--sand)' }
+                        : {}
+                    }
+                    disabled={returning === s.id}
+                    onClick={() => handleReturn(s.id)}
+                  >
+                    {returning === s.id ? 'Recording…' : "I'm back"} <span className="arr">→</span>
+                  </button>
                 </div>
-                <div>
-                  <div className="boat">{s.boatName}</div>
-                  <div className="meta">{s.category}</div>
-                </div>
-                <div className="tcol">
-                  {s.expectedReturn}
-                  <span className="meta">Expected</span>
-                </div>
-                <div
-                  className="tcol"
-                  style={{
-                    color: s.overdue
-                      ? 'var(--clay)'
-                      : i === 0
-                      ? 'rgba(242,237,227,0.85)'
-                      : 'var(--ink-2)',
-                  }}
-                >
-                  {s.overdue ? `+${s.overdueMinutes}m` : 'On time'}
-                  <span className="meta">vs plan</span>
-                </div>
-                <button
-                  className={`btn ${i === 0 ? 'btn-ghost' : 'btn-primary'}`}
-                  style={
-                    i === 0
-                      ? { borderColor: 'rgba(242,237,227,0.4)', color: 'var(--sand)' }
-                      : {}
-                  }
-                  disabled={returning === s.id}
-                  onClick={() => handleReturn(s.id)}
-                >
-                  {returning === s.id ? 'Recording…' : "I'm back"} <span className="arr">→</span>
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </PageContent>
 
         <Footer>
-          <button className="btn btn-ghost btn-lg" onClick={() => router.push('/')}>
+          <button type="button" className="btn btn-ghost btn-lg" onClick={() => router.push('/')}>
             ← Cancel
           </button>
         </Footer>

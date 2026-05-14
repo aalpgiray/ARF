@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Chrome from '@/components/Chrome';
 import Footer from '@/components/Footer';
+import PageContent from '@/components/PageContent';
 import StepIndicator from '@/components/StepIndicator';
 import { useMembers } from '@/lib/hooks/useMembers';
 
@@ -78,25 +79,28 @@ export default function MemberPickerPage() {
           </div>
         </div>
 
-        {loading ? (
-          <div style={{ padding: '40px 32px', color: 'var(--ink-mute)' }}>Loading members…</div>
-        ) : (
-          <div className="member-grid">
-            {filtered.map((m) => (
-              <div
-                key={m.id}
-                className={`member ${selectedId === m.id ? 'selected' : ''}`}
-                onClick={() => setSelectedId(m.id)}
-              >
-                <div className="av">{initials(m.displayName)}</div>
-                <div>
-                  <div className="nm">{m.displayName}</div>
-                  {m.squad && <div className="meta">{m.squad}</div>}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <PageContent>
+          {loading ? (
+            <div style={{ padding: '40px 32px', color: 'var(--ink-mute)' }}>Loading members…</div>
+          ) : (
+            <div className="member-grid">
+              {filtered.map((m) => (
+                <button
+                  type="button"
+                  key={m.id}
+                  className={`member ${selectedId === m.id ? 'selected' : ''}`}
+                  onClick={() => setSelectedId(m.id)}
+                >
+                  <div className="av">{initials(m.displayName)}</div>
+                  <div>
+                    <div className="nm">{m.displayName}</div>
+                    {m.squad && <div className="meta">{m.squad}</div>}
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </PageContent>
 
         <Footer>
           <button className="btn btn-ghost btn-lg" onClick={() => router.push('/')}>

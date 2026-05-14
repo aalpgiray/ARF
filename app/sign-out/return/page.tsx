@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Chrome from '@/components/Chrome';
 import Footer from '@/components/Footer';
+import PageContent from '@/components/PageContent';
 import StepIndicator from '@/components/StepIndicator';
 
 const PRESETS = [
@@ -92,44 +93,48 @@ function ReturnTimePageInner() {
           <StepIndicator current="return" />
         </div>
 
-        <div className="time-pick">
-          <div className="dial">
-            <div className="lbl">Duration</div>
-            <div className="big">{durationLabel(durationMinutes)}</div>
-            <div className="lbl">Common durations</div>
-            <div className="duration-chips">
-              {PRESETS.map((p) => (
-                <button
-                  key={p.minutes}
-                  className={durationMinutes === p.minutes ? 'on' : ''}
-                  onClick={() => setDurationMinutes(p.minutes)}
-                >
-                  {p.label}
-                </button>
-              ))}
+        <PageContent>
+          <div className="time-pick">
+            <div className="dial">
+              <div className="lbl">Duration</div>
+              <div className="big">{durationLabel(durationMinutes)}</div>
+              <div className="lbl">Common durations</div>
+              <div className="duration-chips">
+                {PRESETS.map((p) => (
+                  <button
+                    type="button"
+                    key={p.minutes}
+                    className={durationMinutes === p.minutes ? 'on' : ''}
+                    onClick={() => setDurationMinutes(p.minutes)}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div className="return-card">
-            <div className="lbl">Expected back</div>
-            <div className="when">{fmtTime(returnTime)}</div>
-            <div className="for">Have a great row!</div>
-            {member && boat && (
-              <div className="who">
-                <div className="av">{initials(member.displayName)}</div>
-                <div>
-                  <div className="nm">{member.displayName}</div>
-                  <div className="boat">
-                    {boat.name} · {boat.category}
+            <div className="return-card">
+              <div className="lbl">Expected back</div>
+              <div className="when">{fmtTime(returnTime)}</div>
+              <div className="for">Have a great row!</div>
+              {member && boat && (
+                <div className="who">
+                  <div className="av">{initials(member.displayName)}</div>
+                  <div>
+                    <div className="nm">{member.displayName}</div>
+                    <div className="boat">
+                      {boat.name} · {boat.category}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
+        </PageContent>
 
         <Footer>
           <button
+            type="button"
             className="btn btn-ghost btn-lg"
             onClick={() => router.push(`/sign-out/boat?member_id=${memberId}`)}
           >
@@ -141,6 +146,7 @@ function ReturnTimePageInner() {
               <b style={{ color: 'var(--ink)' }}>{fmtTime(addMinutes(returnTime, 15))}</b>.
             </span>
             <button
+              type="button"
               className="btn btn-primary btn-lg"
               disabled={submitting}
               onClick={handleConfirm}

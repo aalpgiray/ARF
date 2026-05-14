@@ -9,7 +9,7 @@ Club uses Google Workspace (admin-managed). ~70 active members. No individual au
 **Goals:**
 - Tablet kiosk app: sign-out (member → boat → return time) and sign-in (pick session → optional training log)
 - Live dashboard showing who is on water, with overdue session highlighting
-- Member list sourced from Google Workspace Directory API via service account (cached, no per-user auth)
+- Member list managed via seed script (`npm run db:seed`); Google Workspace sync deferred to v2
 - Boat registry with availability states (available / out / maintenance)
 - Optional training data capture on return (distance, duration, type, notes)
 - Schema forward-compatible with Google SSO (nullable `google_user_id` from day one)
@@ -57,9 +57,13 @@ Club uses Google Workspace (admin-managed). ~70 active members. No individual au
 
 Already used in the prototype. Self-host via `next/font` to avoid FOUT and external requests from the kiosk.
 
-### Member list: Google Workspace Directory API + DB cache
+### Member list: Manual seed (v1) → Google Workspace sync (v2)
 
-Service account with domain-wide delegation reads the directory. Results cached in a `members` table, refreshed on a cron (every 6h). Tablet picks from this cached list — no live API call on each session.
+**v1:** Members seeded directly via `prisma/seed.ts`. Club admin updates the file and reruns `npm run db:seed` when roster changes. No external API dependency.
+
+**v2 plan:** OAuth admin consent flow — club admin clicks "Connect Google Workspace", approves read-only directory access, app stores refresh token per org and syncs on cron. Supports multi-club SaaS model. Club does not need Google Cloud Console access.
+
+**Why not service account in v1:** Club uses Google Workspace for Nonprofits without Google Cloud Console access. Service account setup requires Cloud Console. OAuth consent flow (v2) removes this barrier.
 
 **Why cache in DB vs. in-memory:** Vercel serverless functions are ephemeral; in-memory cache doesn't survive across requests.
 
@@ -81,21 +85,20 @@ The design supports sand/mist/dusk palettes and regular/comfy density. Implement
 
 ## Risks / Trade-offs
 
-- **Google Directory API rate limits** → Mitigation: 6h cache refresh with exponential backoff; fall back to stale cache on API error
+- **Stale member list** → Manual seed means roster changes require a code edit + redeploy. Acceptable for v1 (~70 members, low churn). Mitigated in v2 by Google sync.
 - **No auth = anyone can sign out anyone** → Acceptable for v1 (safety log, not security-critical); mitigated by audit trail (all sessions timestamped)
 - **Tablet network outage** → Mitigation: show last-known state from browser cache; queue writes locally and sync when online (future)
-- **`google_user_id` backfill** → When SSO added in v2, match existing sessions by name string; some ambiguity if names aren't unique. Mitigation: store display name + email at sign-out time even before auth
+- **`google_user_id` backfill** → Seed data uses `dummy-NNN` IDs. When Google sync added in v2, match by email to backfill real IDs. Store email on members to enable this.
 - **1280×800 fixed layout** → App targets this viewport; responsive CSS not required in v1 but Tailwind breakpoints shouldn't fight it
 
 ## Migration Plan
 
 1. Provision Neon PostgreSQL database
 2. Run migrations (members, boats, sessions tables)
-3. Configure Google service account + domain-wide delegation
-4. Set env vars on Vercel (DATABASE_URL, GOOGLE_SERVICE_ACCOUNT_JSON, CLUB_DOMAIN)
-5. Seed boats table with club fleet
-6. Deploy to Vercel preview → test on tablet
-7. Promote to production, mount tablet
+3. Set env vars on Vercel (`DATABASE_URL`)
+4. Seed members and boats (`npm run db:seed`)
+5. Deploy to Vercel preview → test on tablet at 1280×800
+6. Promote to production, mount tablet
 
 Rollback: previous Vercel deployment is one click. Database rollback: drop and re-migrate (no prod data in early rollout).
 
@@ -103,5 +106,4 @@ Rollback: previous Vercel deployment is one click. Database rollback: drop and r
 
 - Club name to display in the chrome bar ("Tideway Boat Club" in prototype — confirm with user)
 - Overdue grace period before flagging (prototype shows 15m after expected return — confirm)
-- Who seeds / manages the boats list initially? (Admin UI or direct DB seed for v1?)
-- Google Workspace domain name for service account configuration
+- ~~Google Workspace domain name~~ — deferred to v2

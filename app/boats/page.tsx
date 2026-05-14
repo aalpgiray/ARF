@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Chrome from '@/components/Chrome';
 import Footer from '@/components/Footer';
+import PageContent from '@/components/PageContent';
 
 type BoatState = 'available' | 'out' | 'maintenance';
 
@@ -71,9 +72,10 @@ export default function BoatsPage() {
               if (!isActive && f.value === 'maintenance') cls = 'chip brass';
               return (
                 <button
+                  type="button"
                   key={f.value}
                   className={cls}
-                  style={{ cursor: 'pointer', border: 'none', background: 'none' }}
+                  style={{ cursor: 'pointer' }}
                   onClick={() => setFilter(f.value)}
                 >
                   {f.label} {count > 0 && count}
@@ -83,31 +85,33 @@ export default function BoatsPage() {
           </div>
         </div>
 
-        <div className="registry">
-          {visible.map((b) => (
-            <div key={b.id} className="b">
-              <div className="top">
-                <div>
-                  <div className="nm">{b.name}</div>
-                  <div className="cat" style={{ marginTop: 6 }}>{b.category}</div>
+        <PageContent>
+          <div className="registry">
+            {visible.map((b) => (
+              <div key={b.id} className="b">
+                <div className="top">
+                  <div>
+                    <div className="nm">{b.name}</div>
+                    <div className="cat" style={{ marginTop: 6 }}>{b.category}</div>
+                  </div>
+                  <span
+                    className={stateChipClass(b.effectiveState)}
+                    style={{ fontSize: 9, padding: '3px 8px' }}
+                  >
+                    {stateLabel(b.effectiveState, b.rackLocation)}
+                  </span>
                 </div>
-                <span
-                  className={stateChipClass(b.effectiveState)}
-                  style={{ fontSize: 9, padding: '3px 8px' }}
-                >
-                  {stateLabel(b.effectiveState, b.rackLocation)}
-                </span>
+                <div className="meta">
+                  {b.yearBuilt && <span><b>{b.yearBuilt}</b> built</span>}
+                  {b.weightKg && <span><b>{b.weightKg} kg</b></span>}
+                </div>
               </div>
-              <div className="meta">
-                {b.yearBuilt && <span><b>{b.yearBuilt}</b> built</span>}
-                {b.weightKg && <span><b>{b.weightKg} kg</b></span>}
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </PageContent>
 
         <Footer>
-          <button className="btn btn-ghost btn-lg" onClick={() => router.push('/')}>
+          <button type="button" className="btn btn-ghost btn-lg" onClick={() => router.push('/')}>
             ← Back to dashboard
           </button>
         </Footer>

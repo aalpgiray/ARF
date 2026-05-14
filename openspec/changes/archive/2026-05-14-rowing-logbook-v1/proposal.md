@@ -5,11 +5,11 @@ Rowing clubs rely on paper logbooks or informal processes to track who is on the
 ## What Changes
 
 - New web application (Next.js) deployable to Vercel, accessible via tablet kiosk at club door or any mobile browser
-- Members select their name from a Google Workspace-sourced list and log departure with boat selection and expected return time
+- Members select their name from a manually seeded list and log departure with boat selection and expected return time
 - Members sign back in on return; overdue sessions are visually flagged on the live dashboard
 - Optional training data (distance, duration, session type, notes) can be recorded on return
-- Member list synced from Google Workspace Directory API via service account (cached, no individual login required in v1)
-- Schema includes `google_user_id` nullable field for seamless upgrade to Google SSO in v2
+- Member list managed via seed script (`npm run db:seed`) and optionally a future admin UI; no Google API in v1
+- Schema includes `google_user_id` nullable field for seamless upgrade to Google Workspace sync or SSO in v2
 
 ## Capabilities
 
@@ -17,7 +17,7 @@ Rowing clubs rely on paper logbooks or informal processes to track who is on the
 
 - `session-log`: Core sign-out/sign-in flow — log departure, expected return, and return confirmation for on-water sessions
 - `on-water-dashboard`: Live view of who is currently on the water, with overdue session highlighting
-- `member-directory`: Google Workspace Directory API sync providing cached member list for session logging
+- `member-directory`: Manually seeded member list for session logging; Google Workspace sync deferred to v2
 - `training-data`: Optional training metrics captured at session end (distance, duration, type, notes)
 - `boat-registry`: Managed list of club boats available for selection during session logging
 
@@ -27,7 +27,7 @@ _(none — new project)_
 
 ## Impact
 
-- **New dependencies**: Next.js, PostgreSQL (Neon), Google Workspace Directory API (service account), Vercel hosting
-- **Google Workspace**: Requires service account with domain-wide delegation to read directory
-- **Data**: Single `sessions` table + `members` cache table + `boats` table
-- **No auth in v1**: Public tablet access; `google_user_id` stored but not verified until v2
+- **New dependencies**: Next.js, PostgreSQL (Neon), Vercel hosting
+- **Google Workspace**: Not required in v1; deferred to v2 (OAuth admin consent flow for multi-club SaaS)
+- **Data**: `sessions` table + `members` table (seed-managed) + `boats` table
+- **No auth in v1**: Public tablet access; `google_user_id` stored (nullable) for future sync/SSO upgrade

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Chrome from '@/components/Chrome';
 import Footer from '@/components/Footer';
+import PageContent from '@/components/PageContent';
 import SummaryTiles from '@/components/dashboard/SummaryTiles';
 import SessionTable from '@/components/dashboard/SessionTable';
 import AlertBar from '@/components/dashboard/AlertBar';
@@ -46,11 +47,11 @@ export default async function DashboardPage() {
           <span className="chip">Auto-refresh · 30s</span>
         </div>
 
-        <SummaryTiles sessions={sessions} returnedToday={returnedToday} />
-
-        <AlertBar sessions={sessions} />
-
-        <SessionTable sessions={sessions} />
+        <PageContent>
+          <SummaryTiles sessions={sessions} returnedToday={returnedToday} />
+          <AlertBar sessions={sessions} />
+          <SessionTable sessions={sessions} />
+        </PageContent>
 
         <Footer>
           <Link href="/sign-out" className="btn btn-primary btn-lg">

@@ -90,7 +90,7 @@ a {
 
 .arf {
   width: 100%;
-  min-height: 100vh;
+  height: 100dvh;
   background: var(--sand);
   color: var(--ink);
   font-family: var(--font-sans);
@@ -183,6 +183,15 @@ a {
   display: flex;
   flex-direction: column;
   min-height: 0;
+}
+
+/* ── Scrollable page content area ───────────────────────── */
+
+.page-content {
+  flex: 1 1 0;
+  overflow-y: auto;
+  min-height: 0;
+  padding-bottom: 24px;
 }
 
 /* ── Footer action bar ──────────────────────────────────── */
@@ -412,7 +421,6 @@ a {
 
 .sess-grid {
   margin: 18px 32px 0;
-  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   gap: 1px;
@@ -565,6 +573,7 @@ a {
 .member-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
+  align-content: start;
   gap: 12px;
   padding: 0 32px;
 }
@@ -665,6 +674,7 @@ a {
 
 .alpha {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
   font-family: var(--font-mono);
   font-size: 12px;
@@ -1279,6 +1289,7 @@ a {
   padding: 0 32px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  align-content: start;
   gap: 12px;
 }
 
