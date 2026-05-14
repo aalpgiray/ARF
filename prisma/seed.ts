@@ -1,6 +1,13 @@
+import { config } from 'dotenv';
+config({ path: '.env.local' });
+
+import { neon } from '@neondatabase/serverless';
+import { PrismaNeon } from '@prisma/adapter-neon';
 import { PrismaClient, BoatState } from '@prisma/client';
 
-const prisma = new PrismaClient();
+const sql = neon(process.env.DATABASE_URL!);
+const adapter = new PrismaNeon(sql);
+const prisma = new PrismaClient({ adapter });
 
 const boats = [
   { name: 'Heron',      category: '1x', yearBuilt: 2021, weightKg: 14, state: BoatState.AVAILABLE },
