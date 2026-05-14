@@ -1,66 +1,72 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import Link from 'next/link';
+import Chrome from '@/components/Chrome';
+import Footer from '@/components/Footer';
+import SummaryTiles from '@/components/dashboard/SummaryTiles';
+import SessionTable from '@/components/dashboard/SessionTable';
+import AlertBar from '@/components/dashboard/AlertBar';
+import EmptyState from '@/components/dashboard/EmptyState';
+import DashboardPoller from '@/components/dashboard/DashboardPoller';
+import { getActiveSessions, getReturnedTodayCount } from '@/lib/sessions';
 
-export default function Home() {
+export const dynamic = 'force-dynamic';
+
+export default async function DashboardPage() {
+  const [sessions, returnedToday] = await Promise.all([
+    getActiveSessions(),
+    getReturnedTodayCount(),
+  ]);
+
+  const overdueCount = sessions.filter((s) => s.overdue).length;
+  const headingText =
+    sessions.length === 0
+      ? 'All quiet on the water.'
+      : overdueCount > 0
+        ? `${sessions.length} out, ${overdueCount} running late.`
+        : `${sessions.length} ${sessions.length === 1 ? 'crew' : 'crews'} on the water.`;
+
+  if (sessions.length === 0) {
+    return (
+      <>
+        <Chrome />
+        <EmptyState />
+      </>
+    );
+  }
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+      <Chrome />
+      <DashboardPoller />
+      <div className="arf-body">
+        <div className="screen-h">
+          <div>
+            <div className="eyebrow">On the water · {sessions.length} crews</div>
+            <h1>{headingText}</h1>
+          </div>
+          <span className="chip">Auto-refresh · 30s</span>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+
+        <SummaryTiles sessions={sessions} returnedToday={returnedToday} />
+
+        <AlertBar sessions={sessions} />
+
+        <SessionTable sessions={sessions} />
+
+        <Footer>
+          <Link href="/sign-out" className="btn btn-primary btn-lg">
+            Sign out a boat <span className="arr">→</span>
+          </Link>
+          <Link href="/sign-in" className="btn btn-ghost btn-lg">
+            I&rsquo;m back — sign in
+          </Link>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: 12, alignItems: 'center' }}>
+            <span className="chip">Stay safe on the water 🚣</span>
+            <Link href="/boats" className="btn btn-text">
+              Boat registry
+            </Link>
+          </div>
+        </Footer>
+      </div>
+    </>
   );
 }
