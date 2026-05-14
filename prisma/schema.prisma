@@ -29,7 +29,6 @@ model Member {
   squad        String?
   syncedAt     DateTime  @default(now())
   createdAt    DateTime  @default(now())
-  sessions     Session[]
 
   @@map("members")
 }
@@ -50,7 +49,7 @@ model Boat {
 
 model Session {
   id             String       @id @default(cuid())
-  memberId       String
+  crewMemberIds  String[]
   boatId         String
   departedAt     DateTime     @default(now())
   expectedReturn DateTime
@@ -61,8 +60,7 @@ model Session {
   notes          String?
   createdAt      DateTime     @default(now())
 
-  member Member @relation(fields: [memberId], references: [id])
-  boat   Boat   @relation(fields: [boatId], references: [id])
+  boat Boat @relation(fields: [boatId], references: [id])
 
   @@map("sessions")
 }

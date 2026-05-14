@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useMemo, useState } from 'react';
 import Chrome from '@/components/Chrome';
 import Footer from '@/components/Footer';
 import PageContent from '@/components/PageContent';
@@ -20,12 +20,15 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-export default function MemberPickerPage() {
+function MemberPickerPageInner() {
   const router = useRouter();
+  const params = useSearchParams();
   const { members, loading } = useMembers();
   const [search, setSearch] = useState('');
   const [alpha, setAlpha] = useState('All');
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>(() =>
+    (params.get('member_ids') ?? '').split(',').filter(Boolean)
+  );
 
   const filtered = useMemo(() => {
     let list = members;
@@ -39,7 +42,11 @@ export default function MemberPickerPage() {
     return list;
   }, [members, alpha, search]);
 
-  const selected = members.find((m) => m.id === selectedId);
+  function toggleMember(id: string) {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  }
 
   return (
     <>
@@ -55,7 +62,7 @@ export default function MemberPickerPage() {
 
         <div className="search-row">
           <div className="search">
-            <svg className="ic" width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <svg aria-hidden="true" className="ic" width="20" height="20" viewBox="0 0 24 24" fill="none">
               <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.6" />
               <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
             </svg>
@@ -69,6 +76,7 @@ export default function MemberPickerPage() {
           <div className="alpha">
             {ALPHA.map((l) => (
               <button
+                type="button"
                 key={l}
                 className={alpha === l ? 'on' : ''}
                 onClick={() => { setAlpha(l); setSearch(''); }}
@@ -88,8 +96,8 @@ export default function MemberPickerPage() {
                 <button
                   type="button"
                   key={m.id}
-                  className={`member ${selectedId === m.id ? 'selected' : ''}`}
-                  onClick={() => setSelectedId(m.id)}
+                  className={`member ${selectedIds.includes(m.id) ? 'selected' : ''}`}
+                  onClick={() => toggleMember(m.id)}
                 >
                   <div className="av">{initials(m.displayName)}</div>
                   <div>
@@ -103,20 +111,21 @@ export default function MemberPickerPage() {
         </PageContent>
 
         <Footer>
-          <button className="btn btn-ghost btn-lg" onClick={() => router.push('/')}>
+          <button type="button" className="btn btn-ghost btn-lg" onClick={() => router.push('/')}>
             ← Cancel
           </button>
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 14, alignItems: 'center' }}>
-            {selected && (
+            {selectedIds.length > 0 && (
               <span style={{ color: 'var(--ink-mute)', fontSize: 14 }}>
-                Selected · <b style={{ color: 'var(--ink)' }}>{selected.displayName}</b>
+                <b style={{ color: 'var(--ink)' }}>{selectedIds.length}</b> crew selected
               </span>
             )}
             <button
+              type="button"
               className="btn btn-primary btn-lg"
-              disabled={!selectedId}
-              onClick={() => router.push(`/sign-out/boat?member_id=${selectedId}`)}
-              style={{ opacity: selectedId ? 1 : 0.4 }}
+              disabled={selectedIds.length === 0}
+              onClick={() => router.push(`/sign-out/boat?member_ids=${selectedIds.join(',')}`)}
+              style={{ opacity: selectedIds.length > 0 ? 1 : 0.4 }}
             >
               Choose a boat <span className="arr">→</span>
             </button>
@@ -124,5 +133,13 @@ export default function MemberPickerPage() {
         </Footer>
       </div>
     </>
+  );
+}
+
+export default function MemberPickerPage() {
+  return (
+    <Suspense fallback={null}>
+      <MemberPickerPageInner />
+    </Suspense>
   );
 }

@@ -36,8 +36,7 @@ export default function SessionTable({ sessions, overdueIntensity = 'medium' }: 
             .join(' ')}
         >
           <div className="who">
-            <div className="av">{s.av}</div>
-            <div>{s.who}</div>
+            <div>{s.crewNames.join(', ')}</div>
           </div>
 
           <div className="boat">

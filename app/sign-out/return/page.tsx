@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import Chrome from '@/components/Chrome';
 import Footer from '@/components/Footer';
 import PageContent from '@/components/PageContent';
@@ -34,45 +34,41 @@ function durationLabel(minutes: number) {
   return <>{h}<small>h</small> {m}<small>m</small></>;
 }
 
-interface MemberInfo { displayName: string }
 interface BoatInfo { name: string; category: string; weightKg: number | null }
 
 function ReturnTimePageInner() {
   const router = useRouter();
   const params = useSearchParams();
-  const memberId = params.get('member_id');
+  const memberIdsParam = params.get('member_ids') ?? '';
   const boatId = params.get('boat_id');
 
-  const [member, setMember] = useState<MemberInfo | null>(null);
+  const crewMemberIds = useMemo(
+    () => memberIdsParam.split(',').filter(Boolean),
+    [memberIdsParam]
+  );
+
   const [boat, setBoat] = useState<BoatInfo | null>(null);
   const [durationMinutes, setDurationMinutes] = useState(75);
   const [submitting, setSubmitting] = useState(false);
 
   const now = useMemo(() => new Date(), []);
   const returnTime = addMinutes(now, durationMinutes);
-  const initials = (name: string) =>
-    name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
 
   useEffect(() => {
-    if (memberId) {
-      fetch(`/api/members/${memberId}`)
-        .then((r) => r.json())
-        .then(setMember);
-    }
     if (boatId) {
       fetch(`/api/boats/${boatId}`)
         .then((r) => r.json())
         .then(setBoat);
     }
-  }, [memberId, boatId]);
+  }, [boatId]);
 
   async function handleConfirm() {
-    if (!memberId || !boatId) return;
+    if (!crewMemberIds.length || !boatId) return;
     setSubmitting(true);
     const res = await fetch('/api/sessions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ memberId, boatId, durationMinutes }),
+      body: JSON.stringify({ crewMemberIds, boatId, durationMinutes }),
     });
     if (res.ok) {
       router.push('/');
@@ -117,11 +113,10 @@ function ReturnTimePageInner() {
               <div className="lbl">Expected back</div>
               <div className="when">{fmtTime(returnTime)}</div>
               <div className="for">Have a great row!</div>
-              {member && boat && (
+              {boat && (
                 <div className="who">
-                  <div className="av">{initials(member.displayName)}</div>
                   <div>
-                    <div className="nm">{member.displayName}</div>
+                    <div className="nm">{crewMemberIds.length} crew</div>
                     <div className="boat">
                       {boat.name} · {boat.category}
                     </div>
@@ -136,7 +131,7 @@ function ReturnTimePageInner() {
           <button
             type="button"
             className="btn btn-ghost btn-lg"
-            onClick={() => router.push(`/sign-out/boat?member_id=${memberId}`)}
+            onClick={() => router.push(`/sign-out/boat?member_ids=${memberIdsParam}&boat_id=${boatId}`)}
           >
             ← Back
           </button>

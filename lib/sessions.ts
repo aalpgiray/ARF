@@ -2,8 +2,7 @@ import { prisma } from './prisma';
 
 export type ActiveSession = {
   id: string;
-  who: string;
-  av: string;
+  crewNames: string[];
   boatName: string;
   category: string;
   outTime: string;
@@ -13,16 +12,6 @@ export type ActiveSession = {
   overdueMinutes: number;
 };
 
-function initials(name: string) {
-  return name
-    .split(/[\s+]+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join('')
-    .toUpperCase();
-}
-
 function fmt(d: Date) {
   return d.toTimeString().slice(0, 5);
 }
@@ -31,9 +20,15 @@ export async function getActiveSessions(): Promise<ActiveSession[]> {
   const now = new Date();
   const rows = await prisma.session.findMany({
     where: { returnedAt: null },
-    include: { member: true, boat: true },
+    include: { boat: true },
     orderBy: { departedAt: 'asc' },
   });
+
+  const allCrewIds = [...new Set(rows.flatMap((s) => s.crewMemberIds))];
+  const members = allCrewIds.length
+    ? await prisma.member.findMany({ where: { id: { in: allCrewIds } } })
+    : [];
+  const memberMap = new Map(members.map((m) => [m.id, m.displayName]));
 
   return rows.map((s) => {
     const elapsed = Math.floor((now.getTime() - s.departedAt.getTime()) / 60_000);
@@ -43,8 +38,7 @@ export async function getActiveSessions(): Promise<ActiveSession[]> {
       : 0;
     return {
       id: s.id,
-      who: s.member.displayName,
-      av: initials(s.member.displayName),
+      crewNames: s.crewMemberIds.map((id) => memberMap.get(id) ?? id),
       boatName: s.boat.name,
       category: s.boat.category,
       outTime: fmt(s.departedAt),

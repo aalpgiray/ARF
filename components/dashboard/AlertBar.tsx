@@ -14,7 +14,7 @@ export default function AlertBar({ sessions }: Props) {
         <div key={s.id} className="alert-bar" style={{ marginBottom: 8 }}>
           <span className="lbl">Overdue</span>
           <span>
-            <b>{s.who}</b> · expected {s.expectedReturn} ·{' '}
+            <b>{s.crewNames.join(', ')}</b> · expected {s.expectedReturn} ·{' '}
             <b>{s.overdueMinutes} minutes late</b>
           </span>
         </div>

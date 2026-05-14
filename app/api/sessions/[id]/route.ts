@@ -5,7 +5,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   const { id } = await params;
   const session = await prisma.session.findUnique({
     where: { id },
-    include: { member: { select: { displayName: true } }, boat: { select: { name: true, category: true } } },
+    include: { boat: { select: { name: true, category: true } } },
   });
   if (!session) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json(session);

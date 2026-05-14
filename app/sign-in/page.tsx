@@ -1,15 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 import Chrome from '@/components/Chrome';
 import Footer from '@/components/Footer';
 import PageContent from '@/components/PageContent';
 
-function pad(n: number) { return String(n).padStart(2, '0'); }
-function initials(name: string) {
-  return name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
-}
 function elapsedLabel(minutes: number) {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
@@ -20,8 +16,7 @@ function elapsedLabel(minutes: number) {
 
 interface Session {
   id: string;
-  who: string;
-  av: string;
+  crewNames: string[];
   boatName: string;
   category: string;
   outTime: string;
@@ -87,9 +82,8 @@ export default function SignInPage() {
               {sessions.map((s, i) => (
                 <div key={s.id} className={`signin-row${i === 0 ? ' featured' : ''}`}>
                   <div className="who">
-                    <div className="av">{initials(s.who)}</div>
                     <div>
-                      <div className="nm">{s.who}</div>
+                      <div className="nm">{s.crewNames.join(', ')}</div>
                       <div className="sub">
                         Signed out {s.outTime} · {elapsedLabel(s.elapsedMinutes)} ago
                       </div>

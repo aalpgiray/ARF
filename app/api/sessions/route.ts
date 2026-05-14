@@ -1,10 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 export async function POST(req: NextRequest) {
-  const { memberId, boatId, durationMinutes } = await req.json();
+  const { crewMemberIds, boatId, durationMinutes } = await req.json();
 
-  if (!memberId || !boatId || !durationMinutes) {
+  if (!crewMemberIds || !Array.isArray(crewMemberIds) || crewMemberIds.length === 0) {
+    return NextResponse.json({ error: 'crewMemberIds must be a non-empty array' }, { status: 400 });
+  }
+  if (!boatId || !durationMinutes) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   }
 
@@ -16,7 +19,7 @@ export async function POST(req: NextRequest) {
   const expectedReturn = new Date(now.getTime() + durationMinutes * 60_000);
 
   const session = await prisma.session.create({
-    data: { memberId, boatId, departedAt: now, expectedReturn },
+    data: { crewMemberIds, boatId, departedAt: now, expectedReturn },
   });
 
   return NextResponse.json(session, { status: 201 });

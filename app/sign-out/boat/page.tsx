@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import Chrome from '@/components/Chrome';
 import Footer from '@/components/Footer';
 import PageContent from '@/components/PageContent';
@@ -16,17 +16,25 @@ interface BoatRecord {
   effectiveState: 'available' | 'out' | 'maintenance';
 }
 
-const CATEGORIES = ['1x', '2x', '2-', '4x', '4+', '8+'];
+const CAPACITY: Record<string, number> = {
+  '1x': 1,
+  '2x': 2,
+  '2-': 2,
+  '4x': 4,
+  '4+': 5,
+  '4-': 4,
+  '8+': 9,
+};
 
 function BoatPickerPageInner() {
   const router = useRouter();
   const params = useSearchParams();
-  const memberId = params.get('member_id');
+  const memberIds = params.get('member_ids') ?? '';
+  const crewCount = memberIds.split(',').filter(Boolean).length;
 
   const [boats, setBoats] = useState<BoatRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [catFilter, setCatFilter] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(params.get('boat_id'));
   const [layout, setLayout] = useState<'grid' | 'list'>('grid');
 
   useEffect(() => {
@@ -36,13 +44,16 @@ function BoatPickerPageInner() {
       .finally(() => setLoading(false));
   }, []);
 
-  const filtered = useMemo(() => {
-    if (!catFilter) return boats;
-    return boats.filter((b) => b.category === catFilter);
-  }, [boats, catFilter]);
+  const filtered = useMemo(
+    () => boats.filter((b) => {
+      const cap = CAPACITY[b.category];
+      return cap === undefined || cap === crewCount;
+    }),
+    [boats, crewCount]
+  );
 
   const selected = boats.find((b) => b.id === selectedId);
-  const availableCount = boats.filter((b) => b.effectiveState === 'available').length;
+  const availableCount = filtered.filter((b) => b.effectiveState === 'available').length;
 
   return (
     <>
@@ -58,26 +69,13 @@ function BoatPickerPageInner() {
 
         <div className="search-row">
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <button
-              className={`chip ${catFilter === null ? 'solid' : ''}`}
-              onClick={() => setCatFilter(null)}
-              style={{ cursor: 'pointer' }}
-            >
-              Available {availableCount}
-            </button>
-            {CATEGORIES.map((c) => (
-              <button
-                key={c}
-                className={`chip ${catFilter === c ? 'solid' : ''}`}
-                onClick={() => setCatFilter(catFilter === c ? null : c)}
-                style={{ cursor: 'pointer' }}
-              >
-                {c}
-              </button>
-            ))}
+            <span className="chip solid">
+              {crewCount} crew · {availableCount} available
+            </span>
           </div>
           <div style={{ marginLeft: 'auto' }}>
             <button
+              type="button"
               className="chip"
               onClick={() => setLayout(layout === 'grid' ? 'list' : 'grid')}
               style={{ cursor: 'pointer' }}
@@ -146,7 +144,7 @@ function BoatPickerPageInner() {
                     <div style={{ textAlign: 'right' }}>
                       {selectedId === b.id ? (
                         <span className="chip brass">Selected</span>
-                      ) : b.effectiveState !== 'available' ? (
+                      ) : unavailable ? (
                         <span className="chip clay">Unavailable</span>
                       ) : (
                         <span className="chip ok">Available</span>
@@ -160,7 +158,7 @@ function BoatPickerPageInner() {
         </PageContent>
 
         <Footer>
-          <button className="btn btn-ghost btn-lg" onClick={() => router.push('/sign-out')}>
+          <button type="button" className="btn btn-ghost btn-lg" onClick={() => router.push(`/sign-out?member_ids=${memberIds}`)}>
             ← Back
           </button>
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 14, alignItems: 'center' }}>
@@ -171,11 +169,12 @@ function BoatPickerPageInner() {
               </span>
             )}
             <button
+              type="button"
               className="btn btn-primary btn-lg"
               disabled={!selectedId}
               style={{ opacity: selectedId ? 1 : 0.4 }}
               onClick={() =>
-                router.push(`/sign-out/return?member_id=${memberId}&boat_id=${selectedId}`)
+                router.push(`/sign-out/return?member_ids=${memberIds}&boat_id=${selectedId}`)
               }
             >
               Set return time <span className="arr">→</span>

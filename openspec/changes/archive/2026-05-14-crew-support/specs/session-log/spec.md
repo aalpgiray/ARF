@@ -1,10 +1,4 @@
-# Session Log
-
-## Purpose
-
-Records each boat departure and return. A session begins when a member signs out a boat and closes when they sign back in. Session records are the source of truth for on-water status, overdue detection, and training data capture.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Member can sign out a boat
 One or more members SHALL be able to log a departure by selecting their names (multi-select), a boat, and an expected return time across a 3-step flow. The session SHALL be created with `departed_at` set to the current server timestamp and `crew_member_ids` containing all selected member IDs.
@@ -54,21 +48,15 @@ Any person at the kiosk SHALL be able to log the return of a boat by selecting i
 - **WHEN** no sessions with `returned_at IS NULL` exist
 - **THEN** the sign-in screen SHALL display an empty state message
 
-### Requirement: Expected return time uses duration presets
-The return time step SHALL offer preset duration chips (30m, 45m, 1h, 1h 15m, 1h 30m, 2h, Custom) that compute the expected return time from the current time.
-
-#### Scenario: Preset duration selected
-- **WHEN** a member selects a preset chip
-- **THEN** the computed expected return time SHALL be displayed prominently
-- **THEN** the selected chip SHALL be visually highlighted
-
-#### Scenario: Custom duration
-- **WHEN** a member taps "Custom"
-- **THEN** a manual time input SHALL be presented
-
 ### Requirement: Session data is persisted
 All session fields SHALL be stored durably in PostgreSQL. The schema SHALL include `google_user_id` as a nullable field for future SSO linkage.
 
 #### Scenario: Session record structure
 - **WHEN** a session is created
 - **THEN** it SHALL contain: `id`, `crew_member_ids` (uuid array, minimum 1 element), `boat_id`, `departed_at`, `expected_return`, `returned_at` (nullable), `google_user_id` (nullable), `notes` (nullable), `created_at`
+
+## REMOVED Requirements
+
+### Requirement: (implicit) Single member per session
+**Reason**: Replaced by crew support — `member_id` singular FK removed from session record in favour of `crew_member_ids uuid[]`.
+**Migration**: Existing sessions deleted (dev data). No production data affected.
