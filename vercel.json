@@ -1,10 +1,9 @@
 {
+  "framework": "nextjs",
   "crons": [
     {
       "path": "/api/sync/members",
       "schedule": "0 2 * * *"
     }
-  ],
-  "source": "/(.*)",
-  "destination": "/index.html"
+  ]
 }
