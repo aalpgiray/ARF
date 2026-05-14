@@ -5,13 +5,18 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   const { id } = await params;
   const session = await prisma.session.findUnique({
     where: { id },
-    include: {
-      boat: { select: { name: true, category: true } },
-      member: { select: { displayName: true } },
-    },
+    include: { boat: { select: { name: true, category: true } } },
   });
   if (!session) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  return NextResponse.json(session);
+
+  const member = session.googleUserId
+    ? await prisma.member.findUnique({
+        where: { googleUserId: session.googleUserId },
+        select: { displayName: true },
+      })
+    : null;
+
+  return NextResponse.json({ ...session, member });
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

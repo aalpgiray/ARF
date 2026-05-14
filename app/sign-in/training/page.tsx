@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useMemo, Suspense } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+
 import Chrome from '@/components/Chrome';
 import Footer from '@/components/Footer';
 import PageContent from '@/components/PageContent';
@@ -79,7 +80,7 @@ function TrainingPageInner() {
   }, [session]);
 
   const eyebrow = session
-    ? `You're back · ${session.member.displayName} · ${session.boat.name} · ${session.boat.category}`
+    ? `You're back · ${session.member?.displayName ?? 'Unknown'} · ${session.boat.name} · ${session.boat.category}`
     : "You're back";
 
   async function handleSave() {
@@ -99,7 +100,7 @@ function TrainingPageInner() {
 
   function handleCustomDistance() {
     const val = parseFloat(customDistanceInput);
-    if (!isNaN(val) && val > 0) {
+    if (!Number.isNaN(val) && val > 0) {
       setDistanceKm(val);
       setShowCustom(false);
     }

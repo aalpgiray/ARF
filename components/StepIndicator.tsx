@@ -1,3 +1,5 @@
+import { Fragment } from 'react';
+
 interface Props {
   current: 'member' | 'boat' | 'return';
 }
@@ -13,12 +15,10 @@ export default function StepIndicator({ current }: Props) {
   return (
     <div className="steps">
       {steps.map((step, i) => (
-        <>
-          {i > 0 && <i key={`sep-${step}`} />}
-          <span key={step} className={step === current ? 'cur' : ''}>
-            {labels[step]}
-          </span>
-        </>
+        <Fragment key={step}>
+          {i > 0 && <i />}
+          <span className={step === current ? 'cur' : ''}>{labels[step]}</span>
+        </Fragment>
       ))}
     </div>
   );
