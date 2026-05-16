@@ -7,7 +7,7 @@ The `boats` table SHALL store name, category, year built, hull weight, operation
 - **WHEN** a boat is created
 - **THEN** the record SHALL contain: `id`, `name` (unique), `category`, `yearBuilt` (nullable), `weightKg` (nullable), `state` (AVAILABLE | MAINTENANCE, default AVAILABLE), `rackLocation` (nullable), `isActive` (boolean, default true), `retiredReason` (nullable), `updatedAt`, `createdAt`
 
-### Requirement: Boat registry displays only active fleet boats
+### Requirement: Boat registry displays all club boats
 The public boat registry page SHALL display only boats where `isActive = true`. Retired boats SHALL be hidden from the public registry and the sign-out boat picker.
 
 #### Scenario: All active boats listed
@@ -17,6 +17,8 @@ The public boat registry page SHALL display only boats where `isActive = true`. 
 #### Scenario: Retired boat hidden from registry
 - **WHEN** a boat has `isActive = false`
 - **THEN** it SHALL NOT appear in the public boat registry or the sign-out boat picker
+
+## ADDED Requirements
 
 ### Requirement: Boat picker shows only active available boats
 The sign-out boat picker SHALL only include boats where `isActive = true`. Retired boats SHALL never appear in the picker, regardless of their operational state.

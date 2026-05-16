@@ -3,37 +3,36 @@
 ## Purpose
 
 Manages the list of club members used for sign-out identification. In v1, members are seeded manually. Google Workspace Directory API sync is deferred to v2.
-
 ## Requirements
-
-### Requirement: Member list is manually seeded
-In v1, members are managed via seed script (`npm run db:seed`). Google Workspace Directory API sync is deferred to v2 (requires OAuth admin consent flow for multi-club SaaS use case).
-
-#### Scenario: Member added via seed
-- **WHEN** the seed script runs
-- **THEN** members are upserted into the `members` table by `google_user_id` (populated with a dummy prefix for seed data)
-
 ### Requirement: Member picker displays members as a searchable grid
-The sign-out step 1 SHALL render members from the `members` table as a grid of cards. Members SHALL be filterable by text search and alphabetical tab.
+The sign-out step 1 SHALL render only members where `isActive = true` as a grid of cards. Deactivated members SHALL NOT appear in the sign-out picker or any member-selection UI. Members SHALL be filterable by text search (using `firstName + ' ' + lastName`) and alphabetical tab (using `firstName`).
 
-#### Scenario: Member search
+#### Scenario: Active-only filter applied
+- **WHEN** a user navigates to sign-out step 1
+- **THEN** only members with `isActive = true` SHALL be displayed in the grid
+
+#### Scenario: Deactivated member invisible in sign-out
+- **WHEN** a member has `isActive = false`
+- **THEN** they SHALL NOT appear in the sign-out member picker under any search or filter
+
+#### Scenario: Member search uses full name
 - **WHEN** a user types in the search box
-- **THEN** the grid SHALL filter to members whose display name contains the search string (case-insensitive)
+- **THEN** the grid SHALL filter to members whose `firstName + ' ' + lastName` contains the search string (case-insensitive)
 
-#### Scenario: Alpha filter
+#### Scenario: Alpha filter uses first letter of firstName
 - **WHEN** a user taps a letter tab (A–Z)
-- **THEN** the grid SHALL filter to members whose display name starts with that letter
+- **THEN** the grid SHALL filter to members whose `firstName` starts with that letter
 
-#### Scenario: Member selected
-- **WHEN** a user taps a member card
-- **THEN** the card SHALL be visually highlighted as selected and the member's name SHALL appear in the footer confirmation
+#### Scenario: Member card shows full name
+- **WHEN** a member card is displayed in the picker
+- **THEN** it SHALL show `firstName + ' ' + lastName` as the display name
 
-### Requirement: Member record stores google_user_id for future sync linkage
-The `members` table SHALL store `google_user_id` as a unique field. In v1, seed data uses `dummy-NNN` prefixed values. In v2, real Google sub IDs will be populated via Directory API sync.
+### Requirement: Member record structure
+The `members` table SHALL store `firstName`, `lastName`, `email` (unique), optional `squad`, `isActive` boolean (default true), and timestamps `createdAt`, `updatedAt`. The `googleUserId` field is retained as a nullable unique field for legacy data but SHALL NOT be required for new members. The `displayName` and `syncedAt` fields are removed.
 
 #### Scenario: Record structure
 - **WHEN** a member exists in the table
-- **THEN** the record SHALL contain: `id`, `google_user_id`, `display_name`, `email`, `squad` (nullable), `synced_at`, `created_at`
+- **THEN** the record SHALL contain: `id`, `googleUserId` (nullable, unique), `firstName`, `lastName`, `email` (unique), `squad` (nullable), `isActive` (boolean, default true), `updatedAt`, `createdAt`
 
 ## Deferred to v2
 

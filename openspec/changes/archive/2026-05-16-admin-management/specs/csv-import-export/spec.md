@@ -14,7 +14,7 @@ Both `/admin/members` and `/admin/boats` pages SHALL provide an "↓ Export CSV"
 - **THEN** the file SHALL contain columns: `id, name, category, yearBuilt, weightKg, rackLocation, state, isActive, retiredReason`
 
 ### Requirement: CSV import wizard has three steps: Upload → Review → Done
-Tapping "↑ Import CSV" navigates to the import wizard page. Step 1 is a drag-and-drop upload zone. Step 2 shows the dry-run diff. Step 3 shows success summary.
+Tapping "↑ Import CSV" SHALL navigate to the import wizard page. Step 1 SHALL be a drag-and-drop upload zone. Step 2 SHALL show the dry-run diff. Step 3 SHALL show the success summary.
 
 #### Scenario: Upload zone accepts .csv files
 - **WHEN** a user drops or browses to a .csv file

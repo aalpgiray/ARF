@@ -1,14 +1,7 @@
 ## MODIFIED Requirements
 
-### Requirement: Member record structure
-The `members` table SHALL store `firstName`, `lastName`, `email` (unique), optional `squad`, `isActive` boolean (default true), and timestamps `createdAt`, `updatedAt`. The `googleUserId` field is retained as a nullable unique field for legacy data but SHALL NOT be required for new members. The `displayName` and `syncedAt` fields are removed.
-
-#### Scenario: Record structure
-- **WHEN** a member exists in the table
-- **THEN** the record SHALL contain: `id`, `googleUserId` (nullable, unique), `firstName`, `lastName`, `email` (unique), `squad` (nullable), `isActive` (boolean, default true), `updatedAt`, `createdAt`
-
-### Requirement: Member picker displays only active members
-The sign-out step 1 SHALL render only members where `isActive = true`. Deactivated members SHALL NOT appear in the sign-out picker or any member-selection UI.
+### Requirement: Member picker displays members as a searchable grid
+The sign-out step 1 SHALL render only members where `isActive = true` as a grid of cards. Deactivated members SHALL NOT appear in the sign-out picker or any member-selection UI. Members SHALL be filterable by text search (using `firstName + ' ' + lastName`) and alphabetical tab (using `firstName`).
 
 #### Scenario: Active-only filter applied
 - **WHEN** a user navigates to sign-out step 1
@@ -17,9 +10,6 @@ The sign-out step 1 SHALL render only members where `isActive = true`. Deactivat
 #### Scenario: Deactivated member invisible in sign-out
 - **WHEN** a member has `isActive = false`
 - **THEN** they SHALL NOT appear in the sign-out member picker under any search or filter
-
-### Requirement: Member picker filters by name using firstName + lastName
-The sign-out member picker SHALL filter and display members using their combined full name (`firstName + ' ' + lastName`).
 
 #### Scenario: Member search uses full name
 - **WHEN** a user types in the search box
@@ -32,6 +22,15 @@ The sign-out member picker SHALL filter and display members using their combined
 #### Scenario: Member card shows full name
 - **WHEN** a member card is displayed in the picker
 - **THEN** it SHALL show `firstName + ' ' + lastName` as the display name
+
+## ADDED Requirements
+
+### Requirement: Member record structure
+The `members` table SHALL store `firstName`, `lastName`, `email` (unique), optional `squad`, `isActive` boolean (default true), and timestamps `createdAt`, `updatedAt`. The `googleUserId` field is retained as a nullable unique field for legacy data but SHALL NOT be required for new members. The `displayName` and `syncedAt` fields are removed.
+
+#### Scenario: Record structure
+- **WHEN** a member exists in the table
+- **THEN** the record SHALL contain: `id`, `googleUserId` (nullable, unique), `firstName`, `lastName`, `email` (unique), `squad` (nullable), `isActive` (boolean, default true), `updatedAt`, `createdAt`
 
 ## REMOVED Requirements
 
