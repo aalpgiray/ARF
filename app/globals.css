@@ -1338,45 +1338,47 @@ a {
   font-weight: 500;
 }
 
-/* ── Density: comfy ─────────────────────────────────────── */
+/* ── Density: comfy (desktop-only) ──────────────────────── */
 
-.comfy .arf-chrome {
-  padding: 28px 40px 22px;
-}
+@media (min-width: 769px) {
+  .comfy .arf-chrome {
+    padding: 28px 40px 22px;
+  }
 
-.comfy .screen-h {
-  padding: 36px 40px 22px;
-}
+  .comfy .screen-h {
+    padding: 36px 40px 22px;
+  }
 
-.comfy .screen-h h1 {
-  font-size: 64px;
-}
+  .comfy .screen-h h1 {
+    font-size: 64px;
+  }
 
-.comfy .member-grid {
-  grid-template-columns: repeat(5, 1fr);
-  gap: 14px;
-  padding: 0 40px;
-}
+  .comfy .member-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    padding: 0 40px;
+  }
 
-.comfy .boat-grid {
-  grid-template-columns: repeat(3, 1fr);
-  padding: 0 40px;
-}
+  .comfy .boat-grid {
+    grid-template-columns: repeat(3, 1fr);
+    padding: 0 40px;
+  }
 
-.comfy .tile-row {
-  padding: 0 40px;
-}
+  .comfy .tile-row {
+    padding: 0 40px;
+  }
 
-.comfy .sess-grid {
-  margin: 18px 40px 0;
-}
+  .comfy .sess-grid {
+    margin: 18px 40px 0;
+  }
 
-.comfy .arf-foot {
-  padding: 22px 40px 26px;
-}
+  .comfy .arf-foot {
+    padding: 22px 40px 26px;
+  }
 
-.comfy .search-row {
-  padding: 0 40px 18px;
+  .comfy .search-row {
+    padding: 0 40px 18px;
+  }
 }
 
 /* ── Misc ───────────────────────────────────────────────── */
@@ -2044,4 +2046,260 @@ a {
   flex: 1;
   overflow-y: auto;
   min-height: 0;
+}
+
+/* ── Footer end cluster ─────────────────────────────────── */
+
+.arf-foot-end {
+  margin-left: auto;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* ── Responsive — tablet (≤768px) ───────────────────────── */
+
+@media (max-width: 768px) {
+  /* Prevent page-level horizontal scroll */
+  html {
+    overflow-x: hidden;
+  }
+
+  /* Chrome */
+  .arf-chrome {
+    padding: 16px 20px 14px;
+  }
+  .arf-chrome::after {
+    left: 20px;
+    right: 20px;
+  }
+
+  /* Screen header */
+  .screen-h {
+    padding: 20px 16px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  /* Footer */
+  .arf-foot {
+    padding: 14px 16px;
+  }
+
+  /* Dashboard tiles */
+  .tile-row {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 0 16px;
+  }
+
+  /* Session table — horizontal scroll */
+  .sess-grid {
+    overflow-x: auto;
+    margin: 12px 16px 0;
+  }
+  .sess-grid .sess-head,
+  .sess-grid .sess-row {
+    min-width: 560px;
+  }
+
+  /* Member grid */
+  .member-grid {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 0 16px;
+  }
+
+  /* Boat grid */
+  .boat-grid {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 0 16px;
+  }
+
+  /* Search row */
+  .search-row {
+    padding: 0 16px 14px;
+    flex-wrap: wrap;
+  }
+
+  /* Admin table — horizontal scroll */
+  .atable {
+    overflow-x: auto;
+    margin: 0 16px;
+  }
+  .atable .ahead,
+  .atable .arow {
+    min-width: 520px;
+  }
+}
+
+/* ── Responsive — mobile (≤480px) ───────────────────────── */
+
+@media (max-width: 480px) {
+  /* Chrome — further reduce */
+  .arf-chrome {
+    padding: 12px 16px 10px;
+  }
+  .arf-chrome::after {
+    left: 16px;
+    right: 16px;
+  }
+
+  /* Hide all meta except Live dot + time; hide gear (admin) */
+  .arf-meta > span:not(:first-child):not(.now) {
+    display: none;
+  }
+  .gear {
+    display: none;
+  }
+
+  /* Screen header — compact */
+  .screen-h {
+    padding: 12px 16px 10px;
+    gap: 8px;
+  }
+  .screen-h h1 {
+    font-size: 32px;
+    margin: 0;
+  }
+  .screen-h .eyebrow {
+    font-size: 10px;
+  }
+
+  /* Buttons — smaller on mobile */
+  .btn {
+    font-size: 14px;
+    padding: 12px 18px;
+  }
+  .btn-lg {
+    font-size: 15px;
+    padding: 14px 20px;
+  }
+
+  /* Footer — vertical stack, primary action on top */
+  .arf-foot {
+    padding: 10px 16px 14px;
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .arf-foot .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .arf-foot-end {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Alpha filter — single scrollable row */
+  .alpha {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .alpha button {
+    flex-shrink: 0;
+  }
+
+  /* Dashboard tiles — single column */
+  .tile-row {
+    grid-template-columns: 1fr;
+    padding: 0 16px;
+  }
+
+  /* Member grid — single column */
+  .member-grid {
+    grid-template-columns: 1fr;
+    padding: 0 16px;
+    gap: 6px;
+  }
+
+  /* Member cards — compact horizontal row */
+  .member {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    min-height: 52px;
+    padding: 10px 14px;
+    width: 100%;
+    min-width: unset;
+  }
+  .member .av {
+    flex-shrink: 0;
+  }
+  .member .meta {
+    display: none;
+  }
+
+  /* Boat grid — single column */
+  .boat-grid {
+    grid-template-columns: 1fr;
+    padding: 0 16px;
+    gap: 6px;
+  }
+
+  /* Boat cards — compact horizontal row */
+  .boat-card {
+    flex-direction: row;
+    align-items: center;
+    min-height: unset;
+    padding: 12px 44px 12px 14px;
+    gap: 12px;
+    width: 100%;
+    min-width: unset;
+  }
+  .boat-card .nm {
+    font-size: 20px;
+  }
+  .boat-card .cat {
+    font-size: 10px;
+  }
+  .boat-card .meta {
+    display: none;
+  }
+
+  /* Boat list */
+  .boat-list {
+    padding: 0 16px;
+  }
+
+  /* Return time page — stack vertically */
+  .time-pick {
+    grid-template-columns: 1fr;
+    padding: 0 16px;
+    gap: 12px;
+  }
+  .dial {
+    padding: 20px;
+  }
+  .dial .big {
+    font-size: 72px;
+    margin: 8px 0 12px;
+  }
+  .return-card {
+    padding: 20px;
+  }
+  .return-card .when {
+    font-size: 56px;
+  }
+
+  /* Wizard step strip — wrap on narrow viewports */
+  .wizard-steps {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* CSV dryrun summary — single column */
+  .dryrun-summary {
+    grid-template-columns: 1fr;
+    margin: 0 16px 14px;
+  }
+
+  /* Success state */
+  .success-state .summary-row {
+    flex-direction: column;
+    gap: 16px;
+  }
 }

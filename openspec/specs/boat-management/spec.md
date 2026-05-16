@@ -4,7 +4,7 @@
 TBD - created by archiving change admin-management. Update Purpose after archive.
 ## Requirements
 ### Requirement: Boat list displays active and retired boats with tabs
-The `/admin/boats` page SHALL display a tab strip with Active and Retired tabs, each showing a count badge. The Active tab lists boats where `isActive = true`; the Retired tab lists boats where `isActive = false`. Both lists SHALL be filterable by category chip (All, 1x, 2x, 4x·4+, 8+) and searchable by name.
+The `/admin/boats` page SHALL display a tab strip with Active and Retired tabs, each showing a count badge. The Active tab lists boats where `isActive = true`; the Retired tab lists boats where `isActive = false`. Both lists SHALL be filterable by category chip (All, 1x, 2x, 4x·4+, 8+) and searchable by name. The boat grid SHALL be responsive: on mobile (≤480px) it SHALL display in a single column, and on tablet (481px–768px) it SHALL display in 2 columns.
 
 #### Scenario: Active tab shows fleet boats
 - **WHEN** a user is on the Active tab of `/admin/boats`
@@ -18,6 +18,14 @@ The `/admin/boats` page SHALL display a tab strip with Active and Retired tabs, 
 #### Scenario: Category filter chips narrow results
 - **WHEN** a user taps a category filter chip (e.g., "1x")
 - **THEN** only boats with matching category SHALL be displayed in the current tab
+
+#### Scenario: Boat grid single-column on mobile
+- **WHEN** the boat grid renders at ≤480px
+- **THEN** boat cards SHALL display in a single column at full container width
+
+#### Scenario: Boat grid two-column on tablet
+- **WHEN** the boat grid renders at 481px–768px
+- **THEN** boat cards SHALL display in 2 columns
 
 ### Requirement: Add boat form with required fields
 The admin boat list page SHALL provide an "+ Add boat" button that opens a modal with fields: Name (required, must be unique), Category (required, select: 1x/2x/2-/4x/4+/8+), Year built (optional, integer), Hull weight kg (optional, number), Rack location (optional).

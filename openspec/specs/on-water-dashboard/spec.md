@@ -7,7 +7,7 @@ The primary kiosk screen showing all boats currently on the water. Provides live
 ## Requirements
 
 ### Requirement: Dashboard shows all active sessions
-The dashboard SHALL display all sessions where `returned_at IS NULL` in a table, showing crew name, boat, departure time, expected return, elapsed time, and status.
+The dashboard SHALL display all sessions where `returned_at IS NULL` in a table, showing crew name, boat, departure time, expected return, elapsed time, and status. On viewports ≤768px, the session table SHALL be horizontally scrollable within its container, with column minimum widths reduced to fit. All safety-critical columns (crew, boat, overdue status) SHALL remain visible and not be hidden on any viewport.
 
 #### Scenario: Active sessions displayed
 - **WHEN** one or more sessions have `returned_at IS NULL`
@@ -16,6 +16,10 @@ The dashboard SHALL display all sessions where `returned_at IS NULL` in a table,
 #### Scenario: Empty state
 - **WHEN** no sessions have `returned_at IS NULL`
 - **THEN** the dashboard SHALL display an empty state with friendly copy and a prompt to sign out a boat
+
+#### Scenario: Session table scrollable on mobile
+- **WHEN** the session table renders at ≤768px and content exceeds viewport width
+- **THEN** the table container SHALL allow horizontal scroll without causing page-level overflow
 
 ### Requirement: Dashboard auto-refreshes every 30 seconds
 The dashboard SHALL poll for updated session data every 30 seconds without a full page reload.
@@ -40,11 +44,19 @@ A session is overdue when `returned_at IS NULL AND expected_return < NOW()`. Ove
 - **THEN** the row SHALL be tinted but SHALL NOT pulse
 
 ### Requirement: Dashboard summary tiles show aggregate counts
-The top of the dashboard SHALL show tiles for: currently on water (rower count + boat count), overdue count, and returned today count.
+The top of the dashboard SHALL show tiles for: currently on water (rower count + boat count), overdue count, and returned today count. On mobile (≤480px), tiles SHALL stack in a single column. On tablet (≤768px), tiles SHALL display in a 2-column layout.
 
 #### Scenario: Tile values reflect live data
 - **WHEN** sessions are active or returned
 - **THEN** each tile SHALL reflect the current count from the database
+
+#### Scenario: Tiles single-column on mobile
+- **WHEN** the tile row renders at ≤480px
+- **THEN** tiles SHALL stack vertically (1 column)
+
+#### Scenario: Tiles two-column on tablet
+- **WHEN** the tile row renders at 481px–768px
+- **THEN** tiles SHALL display in 2 columns
 
 ### Requirement: Dashboard provides navigation to sign-out and sign-in flows
 The footer SHALL contain a primary "Sign out a boat" CTA and a secondary "I'm back — sign in" CTA.

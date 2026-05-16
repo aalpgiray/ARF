@@ -7,7 +7,7 @@ Records each boat departure and return. A session begins when a member signs out
 ## Requirements
 
 ### Requirement: Member can sign out a boat
-One or more members SHALL be able to log a departure by selecting their names (multi-select), a boat, and an expected return time across a 3-step flow. The session SHALL be created with `departed_at` set to the current server timestamp and `crew_member_ids` containing all selected member IDs.
+One or more members SHALL be able to log a departure by selecting their names (multi-select), a boat, and an expected return time across a 3-step flow. The session SHALL be created with `departed_at` set to the current server timestamp and `crew_member_ids` containing all selected member IDs. The sign-out wizard SHALL be fully operable on mobile viewports (≥320px). Step containers SHALL be full-width with 16px horizontal padding on mobile. Member selection cards, boat selection cards, and form inputs SHALL be full-width on mobile. The step indicator strip SHALL wrap gracefully at narrow widths.
 
 #### Scenario: Successful sign-out with single member
 - **WHEN** a member completes all 3 steps (members → boat → return time) with one member selected and confirms
@@ -33,8 +33,12 @@ One or more members SHALL be able to log a departure by selecting their names (m
 - **WHEN** a member navigates back from step 2 or 3
 - **THEN** previously selected values SHALL remain pre-selected on return
 
+#### Scenario: Wizard step layout usable on mobile
+- **WHEN** the sign-out wizard renders at ≤480px
+- **THEN** each step's content SHALL be full-width with no horizontal overflow
+
 ### Requirement: Member can sign in on return
-Any person at the kiosk SHALL be able to log the return of a boat by selecting its active session from a list. The session SHALL be updated with `returned_at` set to the current server timestamp. The full crew is marked returned as a unit.
+Any person at the kiosk SHALL be able to log the return of a boat by selecting its active session from a list. The session SHALL be updated with `returned_at` set to the current server timestamp. The full crew is marked returned as a unit. The sign-in flow SHALL be fully operable on mobile viewports (≥320px). Session cards SHALL display full-width on mobile.
 
 #### Scenario: Successful sign-in
 - **WHEN** a person selects an active session and confirms return

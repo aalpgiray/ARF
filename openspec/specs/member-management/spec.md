@@ -4,7 +4,7 @@
 TBD - created by archiving change admin-management. Update Purpose after archive.
 ## Requirements
 ### Requirement: Member list displays active and inactive members with tabs
-The `/admin/members` page SHALL display a tab strip with Active and Inactive tabs, each showing a count badge. The Active tab lists members where `isActive = true`; the Inactive tab lists members where `isActive = false`. Both lists SHALL be searchable by name or email.
+The `/admin/members` page SHALL display a tab strip with Active and Inactive tabs, each showing a count badge. The Active tab lists members where `isActive = true`; the Inactive tab lists members where `isActive = false`. Both lists SHALL be searchable by name or email. The member grid SHALL be responsive: on mobile (≤480px) it SHALL display in a single column, and on tablet (481px–768px) it SHALL display in 2 columns.
 
 #### Scenario: Active tab shows active members
 - **WHEN** a user is on the Active tab of `/admin/members`
@@ -22,6 +22,14 @@ The `/admin/members` page SHALL display a tab strip with Active and Inactive tab
 #### Scenario: Search filters by name or email
 - **WHEN** a user types in the search box
 - **THEN** the displayed rows SHALL filter to members whose full name (`firstName lastName`) or email contains the search string (case-insensitive)
+
+#### Scenario: Member grid single-column on mobile
+- **WHEN** the member grid renders at ≤480px
+- **THEN** member cards SHALL display in a single column at full container width
+
+#### Scenario: Member grid two-column on tablet
+- **WHEN** the member grid renders at 481px–768px
+- **THEN** member cards SHALL display in 2 columns
 
 ### Requirement: Add member form validates required fields and email domain
 The admin member list page SHALL provide an "Add member" button that opens a modal with fields: First name (required), Last name (required), Email (required), Squad (optional). On submit, the API SHALL reject duplicate emails and, if `ALLOWED_EMAIL_DOMAIN` env var is set, reject emails not matching that domain.

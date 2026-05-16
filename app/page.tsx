@@ -60,7 +60,7 @@ export default async function DashboardPage() {
           <Link href="/sign-in" className="btn btn-ghost btn-lg">
             I&rsquo;m back — sign in
           </Link>
-          <div style={{ marginLeft: 'auto', display: 'flex', gap: 12, alignItems: 'center' }}>
+          <div className="arf-foot-end">
             <span className="chip">Stay safe on the water 🚣</span>
             <Link href="/boats" className="btn btn-text">
               Boat registry
