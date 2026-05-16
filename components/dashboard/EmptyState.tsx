@@ -25,7 +25,7 @@ export default function EmptyState({ tone = 'friendly' }: Props) {
         </h2>
         <p className="sub">
           {tone === 'friendly'
-            ? 'Nobody out right now. Be the first one off the pontoon.'
+            ? 'Nobody out right now. Be the first one off the jetty.'
             : 'No crews are currently signed out.'}
         </p>
         <div style={{ marginTop: 40, display: 'flex', gap: 14 }}>

@@ -10,7 +10,7 @@ config({ path: '.env.local' });
 const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
-const SKIP_DISPLAY_NAMES = new Set([
+const SKIP_NAMES = new Set([
   'Calendar Website',
   'Doodle Bot',
   'Forms Forms',
@@ -36,14 +36,8 @@ function loadMembersFromCsv() {
     const lastName = cols[1].trim();
     const email = cols[2].trim().toLowerCase();
     if (!email || !firstName) continue;
-    const displayName = `${firstName} ${lastName}`.trim();
-    if (SKIP_DISPLAY_NAMES.has(displayName)) continue;
-    members.push({
-      googleUserId: `csv-${email}`,
-      displayName,
-      email,
-      squad: null,
-    });
+    if (SKIP_NAMES.has(`${firstName} ${lastName}`.trim())) continue;
+    members.push({ firstName, lastName, email, squad: null as string | null, isActive: true });
   }
   return members;
 }
@@ -105,8 +99,8 @@ async function main() {
   }
   for (const member of members) {
     await prisma.member.upsert({
-      where: { googleUserId: member.googleUserId },
-      update: { displayName: member.displayName, email: member.email, squad: member.squad },
+      where: { email: member.email },
+      update: { firstName: member.firstName, lastName: member.lastName },
       create: member,
     });
   }

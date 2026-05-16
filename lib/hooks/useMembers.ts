@@ -4,8 +4,13 @@ import { useEffect, useState } from 'react';
 
 export interface MemberRecord {
   id: string;
-  displayName: string;
+  firstName: string;
+  lastName: string;
   squad: string | null;
+}
+
+export function displayName(m: Pick<MemberRecord, 'firstName' | 'lastName'>) {
+  return `${m.firstName} ${m.lastName}`.trim();
 }
 
 export function useMembers() {

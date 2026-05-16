@@ -9,14 +9,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   });
   if (!session) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  const member = session.googleUserId
-    ? await prisma.member.findUnique({
-        where: { googleUserId: session.googleUserId },
-        select: { displayName: true },
-      })
-    : null;
-
-  return NextResponse.json({ ...session, member });
+  return NextResponse.json(session);
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

@@ -22,27 +22,33 @@ enum SessionType {
 }
 
 model Member {
-  id           String    @id @default(cuid())
-  googleUserId String    @unique
-  displayName  String
-  email        String    @unique
-  squad        String?
-  syncedAt     DateTime  @default(now())
-  createdAt    DateTime  @default(now())
+  id           String   @id @default(cuid())
+  googleUserId String?  @unique
+  firstName    String
+  lastName     String
+  email        String   @unique
+  squad               String?
+  isActive            Boolean  @default(true)
+  deactivationReason  String?
+  updatedAt           DateTime @updatedAt
+  createdAt    DateTime @default(now())
 
   @@map("members")
 }
 
 model Boat {
-  id           String    @id @default(cuid())
-  name         String    @unique
-  category     String
-  yearBuilt    Int?
-  weightKg     Float?
-  state        BoatState @default(AVAILABLE)
-  rackLocation String?
-  createdAt    DateTime  @default(now())
-  sessions     Session[]
+  id            String    @id @default(cuid())
+  name          String    @unique
+  category      String
+  yearBuilt     Int?
+  weightKg      Float?
+  state         BoatState @default(AVAILABLE)
+  rackLocation  String?
+  isActive      Boolean   @default(true)
+  retiredReason String?
+  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime  @default(now())
+  sessions      Session[]
 
   @@map("boats")
 }

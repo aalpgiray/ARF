@@ -6,7 +6,7 @@ import Chrome from '@/components/Chrome';
 import Footer from '@/components/Footer';
 import PageContent from '@/components/PageContent';
 import StepIndicator from '@/components/StepIndicator';
-import { useMembers } from '@/lib/hooks/useMembers';
+import { displayName as memberDisplayName, useMembers } from '@/lib/hooks/useMembers';
 
 const ALPHA = ['All', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')];
 
@@ -33,11 +33,11 @@ function MemberPickerPageInner() {
   const filtered = useMemo(() => {
     let list = members;
     if (alpha !== 'All') {
-      list = list.filter((m) => m.displayName.toUpperCase().startsWith(alpha));
+      list = list.filter((m) => m.firstName.toUpperCase().startsWith(alpha));
     }
     if (search.trim()) {
       const q = search.trim().toLowerCase();
-      list = list.filter((m) => m.displayName.toLowerCase().includes(q));
+      list = list.filter((m) => memberDisplayName(m).toLowerCase().includes(q));
     }
     return list;
   }, [members, alpha, search]);
@@ -99,9 +99,9 @@ function MemberPickerPageInner() {
                   className={`member ${selectedIds.includes(m.id) ? 'selected' : ''}`}
                   onClick={() => toggleMember(m.id)}
                 >
-                  <div className="av">{initials(m.displayName)}</div>
+                  <div className="av">{initials(memberDisplayName(m))}</div>
                   <div>
-                    <div className="nm">{m.displayName}</div>
+                    <div className="nm">{memberDisplayName(m)}</div>
                     {m.squad && <div className="meta">{m.squad}</div>}
                   </div>
                 </button>

@@ -28,7 +28,7 @@ export async function getActiveSessions(): Promise<ActiveSession[]> {
   const members = allCrewIds.length
     ? await prisma.member.findMany({ where: { id: { in: allCrewIds } } })
     : [];
-  const memberMap = new Map(members.map((m) => [m.id, m.displayName]));
+  const memberMap = new Map(members.map((m) => [m.id, `${m.firstName} ${m.lastName}`]));
 
   return rows.map((s) => {
     const elapsed = Math.floor((now.getTime() - s.departedAt.getTime()) / 60_000);
