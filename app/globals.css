@@ -430,53 +430,56 @@ a {
   border: 1px solid var(--hairline);
 }
 
-.sess-head,
-.sess-row {
-  display: grid;
-  grid-template-columns: 1.4fr 1.4fr 0.9fr 0.9fr 1fr 1.1fr;
-  gap: 16px;
-  padding: 14px 22px;
-  align-items: center;
-  background: var(--paper);
+.sess-table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.sess-head {
+.sess-table thead th {
   font-family: var(--font-mono);
   font-size: 10.5px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--ink-mute);
   background: var(--sand-2);
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 400;
+  white-space: nowrap;
 }
 
-.sess-row .who {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.sess-table th:first-child,
+.sess-table td:first-child { padding-left: 22px; }
+
+.sess-table th:last-child,
+.sess-table td:last-child { padding-right: 22px; }
+
+.sess-table tbody tr {
+  background: var(--paper);
+  position: relative;
+}
+
+.sess-table tbody tr + tr td {
+  border-top: 1px solid var(--hairline);
+}
+
+.sess-table td {
+  padding: 14px 16px;
+  vertical-align: middle;
+}
+
+.sess-table td.who {
   font-size: 17px;
   font-weight: 500;
+  width: 100%;
 }
 
-.sess-row .who .av {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--water);
-  color: var(--ink);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.05em;
-  flex-shrink: 0;
-}
-
-.sess-row .boat {
+.sess-table td.boat {
   font-size: 16px;
+  white-space: nowrap;
 }
 
-.sess-row .boat .sub {
+.sess-table td.boat .sub {
   color: var(--ink-mute);
   font-size: 12.5px;
   display: block;
@@ -486,12 +489,13 @@ a {
   text-transform: uppercase;
 }
 
-.sess-row .tcell {
+.sess-table td.tcell {
   font-variant-numeric: tabular-nums;
   font-size: 16px;
+  white-space: nowrap;
 }
 
-.sess-row .tcell .sub {
+.sess-table td.tcell .sub {
   color: var(--ink-mute);
   font-size: 11.5px;
   font-family: var(--font-mono);
@@ -501,28 +505,31 @@ a {
   margin-top: 2px;
 }
 
-.sess-row .eta {
+.sess-table td.eta {
   font-variant-numeric: tabular-nums;
   font-size: 16px;
   color: var(--ink-2);
 }
 
-.sess-row .status {
-  display: flex;
-  justify-content: flex-end;
+.sess-table td.sess-action {
+  text-align: left;
+  white-space: nowrap;
 }
 
-.sess-row.overdue {
+.sess-table tbody tr.overdue {
   background: linear-gradient(90deg, rgba(185, 74, 59, 0.07), rgba(185, 74, 59, 0.02));
-  position: relative;
 }
 
-.sess-row.overdue .eta {
+.sess-table tbody tr.overdue td {
+  background: transparent;
+}
+
+.sess-table tbody tr.overdue td.eta {
   color: var(--clay);
   font-weight: 500;
 }
 
-.sess-row.overdue::before {
+.sess-table tbody tr.overdue::before {
   content: '';
   position: absolute;
   left: 0;
@@ -541,7 +548,7 @@ a {
   }
 }
 
-.sess-row.overdue.pulse {
+.sess-table tbody tr.overdue.pulse {
   animation: pulseBorder 2.2s ease-in-out infinite;
 }
 
@@ -2098,8 +2105,7 @@ a {
     overflow-x: auto;
     margin: 12px 16px 0;
   }
-  .sess-grid .sess-head,
-  .sess-grid .sess-row {
+  .sess-grid .sess-table {
     min-width: 560px;
   }
 

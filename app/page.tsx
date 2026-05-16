@@ -1,12 +1,12 @@
 import Link from 'next/link';
+import AlertBar from '@/components/dashboard/AlertBar';
+import DashboardPoller from '@/components/dashboard/DashboardPoller';
+import EmptyState from '@/components/dashboard/EmptyState';
+import SessionTable from '@/components/dashboard/SessionTable';
+import SummaryTiles from '@/components/dashboard/SummaryTiles';
 import Chrome from '@/components/Chrome';
 import Footer from '@/components/Footer';
 import PageContent from '@/components/PageContent';
-import SummaryTiles from '@/components/dashboard/SummaryTiles';
-import SessionTable from '@/components/dashboard/SessionTable';
-import AlertBar from '@/components/dashboard/AlertBar';
-import EmptyState from '@/components/dashboard/EmptyState';
-import DashboardPoller from '@/components/dashboard/DashboardPoller';
 import { getActiveSessions, getReturnedTodayCount } from '@/lib/sessions';
 
 export const dynamic = 'force-dynamic';
@@ -56,9 +56,6 @@ export default async function DashboardPage() {
         <Footer>
           <Link href="/sign-out" className="btn btn-primary btn-lg">
             Sign out a boat <span className="arr">→</span>
-          </Link>
-          <Link href="/sign-in" className="btn btn-ghost btn-lg">
-            I&rsquo;m back — sign in
           </Link>
           <div className="arf-foot-end">
             <span className="chip">Stay safe on the water 🚣</span>

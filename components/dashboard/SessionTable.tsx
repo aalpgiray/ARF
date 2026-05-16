@@ -1,4 +1,8 @@
-import { ActiveSession } from '@/lib/sessions';
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import type { ActiveSession } from '@/lib/sessions';
 
 interface Props {
   sessions: ActiveSession[];
@@ -11,64 +15,90 @@ function elapsedLabel(minutes: number) {
 }
 
 export default function SessionTable({ sessions, overdueIntensity = 'medium' }: Props) {
+  const router = useRouter();
   const pulse = overdueIntensity !== 'subtle';
+  const [returning, setReturning] = useState<string | null>(null);
+
+  async function handleReturn(sessionId: string) {
+    setReturning(sessionId);
+    const res = await fetch(`/api/sessions/${sessionId}/return`, { method: 'POST' });
+    if (res.ok) {
+      router.push(`/sign-in/training?session_id=${sessionId}`);
+    } else {
+      setReturning(null);
+    }
+  }
 
   return (
     <div className="sess-grid">
-      <div className="sess-head">
-        <div>Crew</div>
-        <div>Boat</div>
-        <div>Out</div>
-        <div>Expected</div>
-        <div>Time</div>
-        <div style={{ textAlign: 'right' }}>Status</div>
-      </div>
+      <table className="sess-table">
+        <thead>
+          <tr>
+            <th>Crew</th>
+            <th>Boat</th>
+            <th>Out</th>
+            <th>Expected</th>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sessions.map((s) => (
+            <tr
+              key={s.id}
+              className={[
+                s.overdue ? 'overdue' : '',
+                s.overdue && pulse ? 'pulse' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+            >
+              <td className="who">{s.crewNames.join(', ')}</td>
 
-      {sessions.map((s) => (
-        <div
-          key={s.id}
-          className={[
-            'sess-row',
-            s.overdue ? 'overdue' : '',
-            s.overdue && pulse ? 'pulse' : '',
-          ]
-            .filter(Boolean)
-            .join(' ')}
-        >
-          <div className="who">
-            <div>{s.crewNames.join(', ')}</div>
-          </div>
+              <td className="boat">
+                {s.boatName}
+                <span className="sub">{s.category}</span>
+              </td>
 
-          <div className="boat">
-            {s.boatName}
-            <span className="sub">{s.category}</span>
-          </div>
+              <td className="tcell">
+                {s.outTime}
+                <span className="sub">{elapsedLabel(s.elapsedMinutes)}</span>
+              </td>
 
-          <div className="tcell">
-            {s.outTime}
-            <span className="sub">{elapsedLabel(s.elapsedMinutes)}</span>
-          </div>
+              <td className="tcell eta">
+                {s.expectedReturn}
+                {s.overdue && (
+                  <span className="sub" style={{ color: 'var(--clay)' }}>
+                    {s.overdueMinutes}m late
+                  </span>
+                )}
+              </td>
 
-          <div className="tcell eta">
-            {s.expectedReturn}
-            {s.overdue && (
-              <span className="sub" style={{ color: 'var(--clay)' }}>
-                {s.overdueMinutes}m late
-              </span>
-            )}
-          </div>
+              <td className="tcell">{elapsedLabel(s.elapsedMinutes)}</td>
 
-          <div className="tcell">{elapsedLabel(s.elapsedMinutes)}</div>
+              <td className="status">
+                {s.overdue ? (
+                  <span className="chip clay">{s.overdueMinutes}m overdue</span>
+                ) : (
+                  <span className="chip ok">On water</span>
+                )}
+              </td>
 
-          <div className="status">
-            {s.overdue ? (
-              <span className="chip clay">{s.overdueMinutes}m overdue</span>
-            ) : (
-              <span className="chip ok">On water</span>
-            )}
-          </div>
-        </div>
-      ))}
+              <td className="sess-action">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  disabled={returning === s.id}
+                  onClick={() => handleReturn(s.id)}
+                >
+                  {returning === s.id ? 'Recording…' : "I'm back"}
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
