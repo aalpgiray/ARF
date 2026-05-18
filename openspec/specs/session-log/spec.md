@@ -38,25 +38,21 @@ One or more members SHALL be able to log a departure by selecting their names (m
 - **THEN** each step's content SHALL be full-width with no horizontal overflow
 
 ### Requirement: Member can sign in on return
-Any person at the kiosk SHALL be able to log the return of a boat by selecting its active session from a list. The session SHALL be updated with `returned_at` set to the current server timestamp. The full crew is marked returned as a unit. The sign-in flow SHALL be fully operable on mobile viewports (≥320px). Session cards SHALL display full-width on mobile.
+Any person at the kiosk SHALL be able to log the return of a boat by tapping "I'm back" on its session row directly on the dashboard. The session SHALL be updated with `returned_at` set to the current server timestamp. The full crew is marked returned as a unit. There is no longer a separate sign-in list page.
 
-#### Scenario: Successful sign-in
-- **WHEN** a person selects an active session and confirms return
+#### Scenario: Successful sign-in via inline button
+- **WHEN** a person taps "I'm back" on an active session row on the dashboard
 - **THEN** the session's `returned_at` is set to now
 - **THEN** the boat's state is updated to `available`
 - **THEN** the user is offered the optional training capture screen
-
-#### Scenario: Active session displays crew
-- **WHEN** the sign-in screen lists active sessions
-- **THEN** each session SHALL display the boat name and the names of all crew members in `crew_member_ids`
 
 #### Scenario: Skipping training capture
 - **WHEN** a member taps "Skip" on the training capture screen
 - **THEN** the session is closed without training data and the user is redirected to the dashboard
 
-#### Scenario: No active sessions visible
+#### Scenario: No active sessions — no return buttons shown
 - **WHEN** no sessions with `returned_at IS NULL` exist
-- **THEN** the sign-in screen SHALL display an empty state message
+- **THEN** the dashboard displays the empty state and no return buttons are rendered
 
 ### Requirement: Expected return time uses duration presets
 The return time step SHALL offer preset duration chips (30m, 45m, 1h, 1h 15m, 1h 30m, 2h, Custom) that compute the expected return time from the current time.
